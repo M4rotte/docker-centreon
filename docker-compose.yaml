@@ -1,0 +1,78 @@
+version: "3.4"
+
+volumes:
+     mariadb-datadir:
+
+networks:
+  oxyure-net:
+    external:
+      name: oxyure-net
+
+services:
+  php-5.4.40:
+    build:
+      context: .
+      dockerfile: php-5.4.40.Dockerfile
+      args:
+        ROOT_PASSWD: "test"
+        http_proxy: "${http_proxy}"
+    depends_on:
+     - mariadb-10.1.26
+    image: oxyure/php-5.4.40:latest
+    entrypoint:
+     - /sbin/tini
+     - /entrypoint
+    container_name: php-fpm
+    hostname: php-fpm
+    networks:
+      oxyure-net:
+          ipv4_address: "172.30.0.40"
+
+  nginx-1.12.2:
+    build:
+      context: .
+      dockerfile: nginx-1.12.2.Dockerfile
+      args:
+        ROOT_PASSWD: "test"
+        http_proxy: "${http_proxy}"
+    depends_on:
+     - php-5.4.40
+     - mariadb-10.1.26
+    image: oxyure/nginx-1.12.2:latest
+    entrypoint:
+     - /sbin/tini
+     - /entrypoint
+    container_name: nginx
+    hostname: nginx
+    networks:
+      oxyure-net:
+          ipv4_address: "172.30.0.41"
+
+
+  mariadb-10.1.26:
+    build:
+      context: .
+      dockerfile: mariadb-10.1.26.Dockerfile
+      args:
+        # *System* root password:
+        ROOT_PASSWD: "test"
+        http_proxy: "${http_proxy}"
+    image: oxyure/mariadb-10.1.26:latest
+    entrypoint:
+     - /sbin/tini
+     - /entrypoint
+       # *MariaDB* root password
+       # This parameter will be used only if /var/lib/mysql/mysql doesn’t exist,
+       # else it’s ignored.
+       # You advised to not leave it here after the initial setup took place,
+       # (ie: when starting the container with an non-existant /var/lib/mysql/mysql)
+       # As it is part of the entrypoint array, it will be shown as a process argument,
+       # Put something fun ! :)
+     - 'change me!'
+    container_name: mariadb
+    hostname: mariadb
+    networks:
+      oxyure-net:
+          ipv4_address: "172.30.0.42"
+    volumes:
+     - mariadb-datadir:/var/lib/mysql

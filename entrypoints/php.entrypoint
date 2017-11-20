@@ -1,0 +1,35 @@
+#!/bin/sh
+
+echo "PHP-FPM 5.4"
+
+NGINX_ADDR=''
+
+while [ -z "$NGINX_ADDR" ]; do
+
+    NGINX_ADDR="$(dig +short nginx)"
+    
+done
+
+
+_DIRECTIVE="listen.allowed_clients = $NGINX_ADDR"
+sed -i -e 's/;listen.allowed_clients = 127.0.0.1/'"${_DIRECTIVE}"'/' \
+       /etc/php/php-fpm.conf
+
+mkdir /var/www
+echo -e "<?php phpinfo(); ?>\n" > /var/www/index.php
+
+/usr/bin/php-fpm
+sleep 3
+ps -o ppid,pid,user,group,args
+while true; do 
+
+    [ -f /run/php-fpm/php-fpm.pid ] || {
+        
+        echo "No PID file! Exiting…"   
+        exit 1
+    }
+    sleep 30
+
+done
+
+
