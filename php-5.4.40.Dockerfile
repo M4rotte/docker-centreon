@@ -45,7 +45,7 @@ RUN chmod +s /bin/busybox &&\
 
 WORKDIR /
 USER root
-ENTRYPOINT ["/sbin/tini","/entrypoint"]
+ENTRYPOINT ["/sbin/tini","-v","--","/entrypoint"]
 
 
 

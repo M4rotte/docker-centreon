@@ -2,12 +2,6 @@
 
 # MariaDB Server entrypoint
 #
-# Only one mandatory argument: the mariadb root password
-#
-# The password will be set only if /var/lib/mysql/mysql doesn’t exist
-# (so the initial setup takes place).
-# If the mysql database doesn’t exist and root password is not provided
-# the MariaDB server won’t start and the container will exit.
 
 set -e
 
@@ -24,7 +18,7 @@ then
     (mysqld_safe --pid-file=$PID_FILE &) &&\
     sleep 7 &&\
     echo "Setting MariaDB root password…" &&\
-    mysqladmin -u root password "$1" &&\
+    mysqladmin -u root password "$MYSL_ROOT_PASSWD" &&\
     kill -15 $(cat $PID_FILE) && sleep 3 &&\
     echo "MariaDB initial setup OK."
 else
@@ -44,7 +38,7 @@ done
 echo "MariaDB is running."
 
 while true; do 
-    sleep 3
+    sleep 5
     [ -f /run/mysqld/mysqld.pid -a -S /run/mysqld/mysqld.sock ] || {
         
         echo "No PID or no socket! Exiting…"   

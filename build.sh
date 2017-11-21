@@ -15,7 +15,7 @@
 ## for the flatten() function to work.
 ## image: `<user>/<repository>:<tag>` → service: `<repository>`
 USER_ID="oxyure"
-SERVICES="php-5.4.40 nginx-1.12.2 mariadb-10.1.26"
+SERVICES="php-5.4.40 nginx-1.12.2 mariadb-10.1.26 centreon"
 
 
 function prune_docker {
@@ -29,7 +29,7 @@ function flatten {
     ## ARG1: repository (must match service name)
     ## ARG2: entrypoint, default to ["/bin/sh"]
     if [ -z "$2" ]; then entrypoint='["/bin/sh"]'; else entrypoint="$2"; fi
-    echo -e "\n  ### Flattening $USER_ID/$1:latest − Entrypoint: ${entrypoint}\n"
+    echo -e "\n  ### Flattening $USER_ID/$1:latest… − Entrypoint: ${entrypoint}\n"
     RANDNAME="$(echo $RANDOM |md5sum |cut -d' ' -f1)"
     docker run -d --name "$RANDNAME" "$USER_ID/$1:latest"
     docker stop "$RANDNAME"
@@ -46,17 +46,21 @@ function flatten {
 
 for service in ${SERVICES}; do
 
-    echo -e "\n  ### Building image \"${service}\"\n"
+    echo -e "\n  ### Building image \"${service}\"…\n"
     echo -e " \$ docker-compose build $@ ${service}\n"
     docker-compose build $@ ${service}
 
 done
 
-flatten php-5.4.40      '["/sbin/tini","/entrypoint"]'
-flatten nginx-1.12.2    '["/sbin/tini","/entrypoint"]'
-flatten mariadb-10.1.26 '["/sbin/tini","/entrypoint"]'
+echo -e "\n  ### All images have been built.\n"
 
-echo -e "\n  ### All builds finished\n"
+#~ for image in "php-5.4.40 nginx-1.12.2 mariadb-10.1.26"; do
+    #~ flatten "$image" '["/sbin/tini","/entrypoint"]'
+#~ done
+
+#~ flatten centreon '["/entrypoint"]'
+
+#~ echo -e "\n  ### All images have been flattened.\n"
 
 #~ prune_docker
 

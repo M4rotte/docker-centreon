@@ -1,0 +1,14 @@
+[centreon-standard]
+name=Centreon RPM repository for ces $releasever
+baseurl=http://yum.centreon.com/standard/3.4/el7/stable/$basearch/
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CES
+
+[centreon-standard-noarch]
+name=Centreon RPM repository for ces $releasever
+baseurl=http://yum.centreon.com/standard/3.4/el7/stable/noarch/
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CES
+

@@ -40,4 +40,4 @@ RUN chmod go-rwx /entrypoint
 
 WORKDIR /
 USER root
-ENTRYPOINT ["/sbin/tini","/entrypoint"]
+ENTRYPOINT ["/sbin/tini","-v","--","/entrypoint"]

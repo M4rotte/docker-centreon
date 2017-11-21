@@ -1,0 +1,53 @@
+#!/bin/sh
+
+exit_if_no_pid_file() {
+    # exit_if_no_pid_file(pidfile, process_name)
+    while true; do 
+        [ -f "$1" ] || { echo "No more $2 PID file! Exiting…" && exit 1; }
+        sleep 10
+    done
+}
+
+echo "Centreon 2.8 - IP:$IP_ADDR"
+
+IP_ADDR="$(hostname -i)"
+
+## Apache configuration
+
+## END Apache configuration
+
+
+## PHP configuration
+sed -i -e "s/\;date.timezone =/date.timezone = Europe\/Paris/" /etc/php.ini
+## END PHP configuration
+
+## SSH Configuration
+[ -f /etc/ssh/ssh_host_dsa_key ]     || { echo "Generating DSA host key…"     && ssh-keygen -f /etc/ssh/ssh_host_dsa_key -N '' -t dsa 1>/dev/null; }
+[ -f /etc/ssh/ssh_host_rsa_key ]     || { echo "Generating RSA host key…"     && ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa 1>/dev/null; }
+[ -f /etc/ssh/ssh_host_ecdsa_key ]   || { echo "Generating ECDSA host key…"   && ssh-keygen -f /etc/ssh/ssh_host_ecdsa_key -N '' -t rsa 1>/dev/null; }
+[ -f /etc/ssh/ssh_host_ed25519_key ] || { echo "Generating ED25519 host key…" && ssh-keygen -f /etc/ssh/ssh_host_ed25519_key -N '' -t rsa 1>/dev/null; }
+## EB SSH Configuration
+
+## Test file: TO BE REMOVED
+echo -e "<?php phpinfo(); ?>\n" > /var/www/index.php
+
+
+
+
+
+/usr/sbin/httpd
+
+sleep 3
+ps -o ppid,pid,user,group,args
+
+exit_if_no_pid_file /etc/httpd/run/httpd.pid Apache
+
+
+
+
+
+
+
+
+
+
