@@ -20,11 +20,17 @@ RUN echo -e "[main]\nenabled=0" > /etc/yum/pluginconf.d/fastestmirror.conf &&\
                    openssl-devel perl-DBD-MySQL php php-mysql php-gd php-ldap php-xml php-mbstring \
                    perl-Config-IniFiles perl-DBI perl-DBD-MySQL perl-rrdtool perl-Crypt-DES perl-Digest-SHA1 \
                    perl-Digest-HMAC net-snmp-utils perl-Socket6 perl-IO-Socket-INET6 net-snmp net-snmp-libs php-snmp \
-                   dmidecode perl-Net-SNMP net-snmp-perl fping cpp gcc gcc-c++ libstdc++ glib2-devel \
+                   dmidecode perl-Net-SNMP net-snmp-perl fping cpp gcc gcc-c++ libstdc++ glib2-devel glibc-static \
                    php-pear nagios-plugins &&\
     pear channel-update pear.php.net &&\
     pear upgrade-all &&\
     yum clean all
+
+## Build and install Tini
+RUN cd /tmp &&\
+    git clone https://github.com/krallin/tini.git &&\
+    cd tini && cmake . && make && cp tini /sbin &&\
+    cd /tmp && rm -rf tini
 
 ## Build and install Centreon
 WORKDIR /tmp
@@ -40,11 +46,13 @@ RUN git clone https://github.com/centreon/centreon-engine.git &&\
     cd centreon-engine && cd build && cmake . && make -j3 && make install &&\
     cd /tmp && rm -rf centreon-engine
 
+RUN git clone https://github.com/centreon/centreon.git &&\
+    cd centreon
 
 ## Commented out until everything’s working! 
 #### Uninstall some packages ##
 ##RUN yum -y erase git make cmake gcc gcc-c++ glibc-devel rrdtool-devel qt-devel gnutls-devel \
-##                 glib2-devel glibc-devel fontconfig-devel libjpeg-devel libpng-devel gd-devel \
+##                 glib2-devel glibc-devel glibc-static fontconfig-devel libjpeg-devel libpng-devel gd-devel \
 ##                 rrdtool-devel qt-devel gnutls-devel openssl-devel &&\
 ##    yum -y autoremove
 
@@ -68,4 +76,4 @@ EXPOSE 80/tcp
 
 WORKDIR /
 USER root
-ENTRYPOINT ["/entrypoint"]
+ENTRYPOINT ["/sbin/tini","-v","--","/entrypoint"]

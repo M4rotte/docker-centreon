@@ -1,7 +1,6 @@
 #!/bin/sh
 
 # MariaDB Server entrypoint
-#
 
 set -e
 
@@ -13,35 +12,29 @@ echo "MariaDB 10.1.26"
 if [ ! -d "$DATADIR/mysql" ]
 then
     echo "MariaDB Initial setup…"
-    [ -z "$1" ] && { echo "MariaDB Initial setup FAILED." ; echo "No password provided for the MariaDB root account. Exiting."; exit 1; }
     mysql_install_db --force --skip-auth-anonymous-user --user=mysql
-    (mysqld_safe --pid-file=$PID_FILE &) &&\
-    sleep 7 &&\
+    (mysqld_safe --pid-file="$PID_FILE" --datadir="$DATADIR" &) &&\
+    sleep 4 &&\
     echo "Setting MariaDB root password…" &&\
-    mysqladmin -u root password "$MYSL_ROOT_PASSWD" &&\
-    kill -15 $(cat $PID_FILE) && sleep 3 &&\
+    mysqladmin -u root password "$MARIADB_ROOT_PASSWD" &&\
+    kill -15 $(cat $PID_FILE) &&\
     echo "MariaDB initial setup OK."
+    sleep 4
 else
     echo "Directory $DATADIR/mysql exists. Continuing…"
 fi
       
 echo "Starting MariaDB…"
-exec mysqld_safe --pid-file=$PID_FILE &
+exec mysqld_safe --pid-file="$PID_FILE" --datadir="$DATADIR" &
 
 while [ -z "$(pidof 'mysqld')" ]; do
 
     sleep 1
-    echo "$(ps -o ppid,pid,user,group,args)"
+    echo -n "."
 
 done
 
-echo "MariaDB is running."
+echo -e "\nMariaDB is running."
 
-while true; do 
-    sleep 5
-    [ -f /run/mysqld/mysqld.pid -a -S /run/mysqld/mysqld.sock ] || {
-        
-        echo "No PID or no socket! Exiting…"   
-        exit 1
-    }
-done
+tail -f /dev/null
+
