@@ -41,6 +41,7 @@ RUN git clone https://github.com/centreon/centreon-engine.git &&\
     cd /tmp && rm -rf centreon-engine
 
 
+## Commented out until everything’s working! 
 #### Uninstall some packages ##
 ##RUN yum -y erase git make cmake gcc gcc-c++ glibc-devel rrdtool-devel qt-devel gnutls-devel \
 ##                 glib2-devel glibc-devel fontconfig-devel libjpeg-devel libpng-devel gd-devel \

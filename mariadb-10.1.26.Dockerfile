@@ -6,13 +6,13 @@ LABEL com.oxyure.vendor="United Microbiotas" \
 ## Additional repositories & Common packages ##
 RUN apk update && apk add tini bind-tools
 
-## MariaDB configuration
-
-
 # Install MariaDB & remove OpenRC (this image will use a custom entrypoint).
 # Also remove sudo.
 RUN apk del --purge openrc sudo &&\
     apk add mariadb=10.1.26-r0 mariadb-client=10.1.26-r0
+
+## MariaDB configuration
+
 
 ## Clean the room ##
 RUN rm -rf /var/cache/apk/* /tmp/* \
