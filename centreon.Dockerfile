@@ -1,10 +1,13 @@
+# Re-add proxy setting for PEAR if needed:
+# pear config-set http_proxy $http_proxy
+
+
 FROM centos:7
 LABEL com.oxyure.vendor="United Microbiotas" \
       maintainer="stef@oxyure.com" \
       description="Centreon central server"
 
 ## Additional repositories & packages ##
-COPY files/etc/pki /etc/pki
 COPY files/etc/yum.repos.d /etc
 
 ## Do not use 'fastestmirror' Yum plugin
@@ -19,10 +22,9 @@ RUN echo -e "[main]\nenabled=0" > /etc/yum/pluginconf.d/fastestmirror.conf &&\
                    perl-Digest-HMAC net-snmp-utils perl-Socket6 perl-IO-Socket-INET6 net-snmp net-snmp-libs php-snmp \
                    dmidecode perl-Net-SNMP net-snmp-perl fping cpp gcc gcc-c++ libstdc++ glib2-devel \
                    php-pear nagios-plugins &&\
-    pear config-set http_proxy $http_proxy &&\
     pear channel-update pear.php.net &&\
-    pear upgrade-all
-
+    pear upgrade-all &&\
+    yum clean all
 
 ## Build and install Centreon
 WORKDIR /tmp
@@ -40,7 +42,9 @@ RUN git clone https://github.com/centreon/centreon-engine.git &&\
 
 
 #### Uninstall some packages ##
-##RUN yum -y erase git make cmake gcc gcc-c++ glibc-devel rrdtool-devel qt-devel gnutls-devel &&\
+##RUN yum -y erase git make cmake gcc gcc-c++ glibc-devel rrdtool-devel qt-devel gnutls-devel \
+##                 glib2-devel glibc-devel fontconfig-devel libjpeg-devel libpng-devel gd-devel \
+##                 rrdtool-devel qt-devel gnutls-devel openssl-devel &&\
 ##    yum -y autoremove
 
 #### Remove some files ##

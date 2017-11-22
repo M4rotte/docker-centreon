@@ -3,15 +3,9 @@ LABEL com.oxyure.vendor="United Microbiotas" \
       maintainer="stef@oxyure.com" \
       description="Nginx 1.12.2"
 
-# The alpine:3.6 image has root password disabled. We let the possibility to define one at build time.
-# If the following root password build argument is empty, a (long) random string will be choosen to 
-# still forbid normal users to su to root.
-ARG ROOT_PASSWD=""
-RUN if [ -z "${ROOT_PASSWD}" ]; then echo "root:$(echo $RANDOM |sha512sum |cut -d' ' -f1)" | chpasswd; \
-        else echo "root:${ROOT_PASSWD}" | chpasswd; fi &&\
-        apk update
 
-## Additional repositories & Common packages ##
+
+## Additional repositories ##
 RUN apk update && apk add tini bind-tools
 
 ## Nginx 1.12.2 ## ## ## ## ##

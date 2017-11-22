@@ -3,17 +3,8 @@ LABEL com.oxyure.vendor="United Microbiotas" \
       maintainer="stef@oxyure.com" \
       description="MariaDB 10.1.26"
 
-# If those two password build arguments are empty, a random string will be choosen.
-# NB: This is NOT the MariaDB root password
-ARG ROOT_PASSWD=""
-ARG OPERATOR_PASSWD=""
-
-# Change some passwords (do not leave them empty)
-RUN if [ -z "${ROOT_PASSWD}" ]; then echo "root:$(echo $RANDOM |sha512sum |cut -d' ' -f1)" | chpasswd; \
-        else echo "root:${ROOT_PASSWD}" | chpasswd; fi
-
 ## Additional repositories & Common packages ##
-RUN apk update && apk add tini
+RUN apk update && apk add tini bind-tools
 
 ## MariaDB configuration
 

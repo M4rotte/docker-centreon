@@ -14,6 +14,9 @@ services:
     build:
       context: .
       dockerfile: php-5.4.40.Dockerfile
+      args:
+        ROOT_PASSWD: "test"
+        http_proxy: "${http_proxy}"
     depends_on:
      - mariadb-10.1.26
     image: oxyure/php-5.4.40:latest
@@ -30,6 +33,9 @@ services:
     build:
       context: .
       dockerfile: nginx-1.12.2.Dockerfile
+      args:
+        ROOT_PASSWD: "test"
+        http_proxy: "${http_proxy}"
     depends_on:
      - php-5.4.40
      - mariadb-10.1.26
@@ -48,6 +54,8 @@ services:
     build:
       context: .
       dockerfile: mariadb-10.1.26.Dockerfile
+      args:
+        http_proxy: "${http_proxy}"
     image: oxyure/mariadb-10.1.26:latest
     entrypoint:
      - /sbin/tini
@@ -64,6 +72,10 @@ services:
     build:
       context: .
       dockerfile: centreon.Dockerfile
+      args:
+        ROOT_PASSWD: "test"
+        http_proxy: "${http_proxy}"
+        https_proxy: "${https_proxy}"
     depends_on:
      - mariadb-10.1.26
     image: oxyure/centreon:latest
