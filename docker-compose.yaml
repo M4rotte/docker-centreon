@@ -43,17 +43,19 @@ services:
       #~ oxyure-net:
           #~ ipv4_address: "172.30.0.41"
 
-  mariadb-10.1.26:
+  mariadb:
     build:
       context: .
       dockerfile: mariadb-10.1.26.Dockerfile
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
-    image: oxyure/mariadb-10.1.26:latest
+    image: oxyure/mariadb:latest
     env_file: .env
     entrypoint:
      - /sbin/tini
+     - -v
+     - --
      - /entrypoint
     container_name: mariadb
     hostname: mariadb
@@ -71,10 +73,13 @@ services:
        http_proxy: ${http_proxy}
        https_proxy: ${https_proxy}
     depends_on:
-     - mariadb-10.1.26
+     - mariadb
     image: oxyure/centreon:latest
     env_file: .env
     entrypoint:
+     - /sbin/tini
+     - -v
+     - --
      - /entrypoint
     container_name: centreon
     hostname: centreon

@@ -16,7 +16,7 @@
 ## image: `<user>/<repository>:<tag>` → service: `<repository>`
 USER_ID="oxyure"
 #~ SERVICES="php-5.4.40 nginx-1.12.2 mariadb-10.1.26 centreon"
-SERVICES="mariadb-10.1.26 centreon"
+SERVICES="mariadb centreon"
 
 function prune_docker {
     echo -e "\n  ### Do some cleaning…\n"
@@ -28,15 +28,19 @@ function flatten {
     ## Create a flattened version of image tagged "flat"
     ## ARG1: repository (must match service name)
     ## ARG2: entrypoint, default to ["/bin/sh"]
+    ## ARG3: user, default to root
+    ## ARG4: workdir, default to /
     if [ -z "$2" ]; then entrypoint='["/bin/sh"]'; else entrypoint="$2"; fi
-    echo -e "\n  ### Flattening $USER_ID/$1:latest… − Entrypoint: ${entrypoint}\n"
+    if [ -z "$3" ]; then user='root'; else user="$3"; fi
+    if [ -z "$4" ]; then workdir='/'; else workdir="$4"; fi
+    echo -e "\n  ### Flattening $USER_ID/$1:latest… − Entrypoint:${entrypoint}, User:${user}, Workdir:${workdir}\n"
     RANDNAME="$(echo $RANDOM |md5sum |cut -d' ' -f1)"
     docker run -d --name "$RANDNAME" "$USER_ID/$1:latest"
     docker stop "$RANDNAME"
     docker export -o "/tmp/$RANDNAME.tar" "$RANDNAME"
     docker import \
-       --change 'WORKDIR /' \
-       --change 'USER root' \
+       --change 'WORKDIR '"${workdir}" \
+       --change 'USER '"${user}" \
        --change 'ENTRYPOINT '"${entrypoint}" \
        --message "/tmp/$RANDNAME.tar" \
        "/tmp/$RANDNAME.tar" "$USER_ID/$1:flat"
@@ -54,15 +58,12 @@ done
 
 echo -e "\n  ### All images have been built.\n"
 
-#~ for image in "php-5.4.40 nginx-1.12.2 mariadb-10.1.26"; do
-    #~ flatten "$image" '["/sbin/tini","/entrypoint"]'
-#~ done
+flatten centreon '["/sbin/tini","-v","--","/entrypoint"]' root /
+flatten mariadb  '["/sbin/tini","-v","--","/entrypoint"]' root /var/lib/mysql
 
-#~ flatten centreon '["/entrypoint"]'
+echo -e "\n  ### All images have been flattened.\n"
 
-#~ echo -e "\n  ### All images have been flattened.\n"
-
-#~ prune_docker
+prune_docker
 
 docker image ls
 

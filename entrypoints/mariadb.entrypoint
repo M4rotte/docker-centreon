@@ -1,14 +1,19 @@
 #!/bin/sh
 
-# MariaDB Server entrypoint
-
 set -e
+
+while [ -z "${SERVER_HOSTNAME}" ]; do SERVER_HOSTNAME="$(hostname)"; done
+while [ -z "${IP_ADDR}" ]; do IP_ADDR="$(hostname -i)"; done
+
+echo -e "\n######  MariaDB 10.1.26  #######"
+echo    "ADDRESS:  $IP_ADDR"
+echo    "HOSTNAME: $SERVER_HOSTNAME"
+echo -e "################################\n"
 
 PID_FILE=/run/mysqld/mysqld.pid
 DATADIR=/var/lib/mysql
 
-echo "MariaDB 10.1.26"
-
+# We go for MariaDB server setup only if /var/lib/mysql/mysql isn’t already a directory.
 if [ ! -d "$DATADIR/mysql" ]
 then
     echo "MariaDB Initial setup…"
@@ -19,22 +24,21 @@ then
     mysqladmin -u root password "$MARIADB_ROOT_PASSWD" &&\
     kill -15 $(cat $PID_FILE) &&\
     echo "MariaDB initial setup OK."
-    sleep 4
+    sleep 4 # LaRache©
 else
     echo "Directory $DATADIR/mysql exists. Continuing…"
 fi
-      
+
+# Start
 echo "Starting MariaDB…"
-exec mysqld_safe --pid-file="$PID_FILE" --datadir="$DATADIR" &
+exec mysqld_safe --pid-file="$PID_FILE" --datadir="$DATADIR" --user=mysql &
 
 while [ -z "$(pidof 'mysqld')" ]; do
-
     sleep 1
     echo -n "."
-
 done
 
-echo -e "\nMariaDB is running."
+echo -e "MariaDB is running.\n"
 
 tail -f /dev/null
 

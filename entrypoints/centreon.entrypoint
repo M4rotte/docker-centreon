@@ -1,19 +1,26 @@
 #!/bin/sh
 
-echo "Centreon 2.8 - IP:$IP_ADDR"
+set -e
 
-IP_ADDR="$(hostname -i)"
-SERVER_HOSTNAME="$(hostname)"
+while [ -z "${SERVER_HOSTNAME}" ]; do SERVER_HOSTNAME="$(hostname)"; done
+while [ -z "${IP_ADDR}" ]; do IP_ADDR="$(hostname -i)"; done
+
+echo -e "\n######  Centreon (master)  #####"
+echo    "ADDRESS:  $IP_ADDR"
+echo    "HOSTNAME: $SERVER_HOSTNAME"
+echo -e "################################\n"
+ps -Hef |tail -n +2
 
 ## Apache configuration
 
-sed -i -e 's/#ServerName www.example.com:80/ServerName '"${SERVER_HOSTNAME}"':80/' \
+sed -i -e 's/#ServerName www\.example\.com:80/ServerName '"${SERVER_HOSTNAME}"':80/' \
        -e 's/DocumentRoot "\/var\/www\/html"/DocumentRoot "\/var\/www"/' \
-       -e '/<Directory "\/var\/www">/{N;N;N;N}d' \
+       -e '/\<Directory "\/var\/www">/{N;N;N;N;d}' \
+       -e 's/\<Directory "\/var\/www\/html"\>/\<Directory "\/var\/www"\>/' \
        -e 's/# Allow open access:/Options Indexes FollowSymLinks/' \
-       /etc/httpd/conf/httpd.conf &&\
-       chown -R root:apache /var/www &&\
-       chmod -R ug+rwx /var/www &&\
+       /etc/httpd/conf/httpd.conf
+       chown -R apache:apache /var/www &&\
+       chmod -R u+rwx /var/www &&\
        chmod -R o-rwx /var/www 
 
 ## END Apache configuration
@@ -27,10 +34,20 @@ sed -i -e "s/\;date.timezone =/date.timezone = Europe\/Paris/" /etc/php.ini
 
 ## Test file: TO BE REMOVED
 echo -e "<?php phpinfo(); ?>\n" > /var/www/index.php
+chmod -R u+rwx /var/www/index.php
 
-/usr/sbin/httpd -e info -DFOREGROUND
+apache_stop()   { echo " * Apache is shutting down…"; /usr/sbin/httpd -k graceful-stop; }
+apache_reload() { echo " * Apache is re-loading its configuration…"; /usr/sbin/httpd -k reload; }
 
+trap apache_stop 2 15
+trap apache_reload 1
 
+echo -e " * Starting Centreon engine… \n"
+exec /usr/local/bin/centengine /usr/local/etc/centengine.cfg &
+echo -e " * Starting Apache… \n"
+exec /usr/sbin/httpd -e debug -DFOREGROUND &
+
+tail -f /dev/null
 
 
 
