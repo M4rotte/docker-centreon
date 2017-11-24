@@ -19,9 +19,12 @@ RUN echo -e "[main]\nenabled=0" > /etc/yum/pluginconf.d/fastestmirror.conf &&\
                    perl-Config-IniFiles perl-DBI perl-DBD-MySQL perl-rrdtool perl-Crypt-DES perl-Digest-SHA1 \
                    perl-Digest-HMAC net-snmp-utils perl-Socket6 perl-IO-Socket-INET6 net-snmp net-snmp-libs php-snmp \
                    dmidecode perl-Net-SNMP net-snmp-perl fping cpp gcc gcc-c++ libstdc++ glib2-devel glibc-static \
-                   php-pear nagios-plugins redhat-lsb-core &&\
+                   php-pear nagios-plugins redhat-lsb-core sendmail mailx sudo perl net-snmp-perl perl-XML-LibXML \
+                   perl-JSON perl-libwww-perl perl-XML-XPath perl-Net-Telnet perl-Net-DNS perl-DBI perl-DBD-MySQL perl-DBD-Pg \
+                   perl-File-Find-Object perl-Pod-Parser &&\
     pear channel-update pear.php.net &&\
-    pear upgrade-all &&\
+    pear --force upgrade-all &&\
+    pear channel-update pear.php.net &&\
     yum clean all
 
 ## Build and install Tini ##
