@@ -43,9 +43,8 @@ RUN git clone https://github.com/centreon/centreon-clib.git &&\
     cd /tmp && rm -rf centreon-broker &&\
     git clone https://github.com/centreon/centreon-engine.git &&\
     cd centreon-engine && cd build && cmake . && make -j3 && make install &&\
-    cd /tmp && rm -rf centreon-engine &&\
-    git clone https://github.com/centreon/centreon.git &&\
-    cd centreon
+    cd /usr/local/src &&\
+    git clone https://github.com/centreon/centreon.git
 
 ## Uninstall some packages ##
 RUN yum -y erase git make cmake gcc gcc-c++ glibc-devel rrdtool-devel qt-devel gnutls-devel \

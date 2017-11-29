@@ -53,5 +53,7 @@ services:
     networks:
       oxyure-net:
           ipv4_address: "172.30.0.100"
+    ports:
+     - "5555:80"
     volumes:
      - var-spool-centreon:/var/spool/centreon

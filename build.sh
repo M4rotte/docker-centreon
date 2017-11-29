@@ -15,7 +15,6 @@
 ## for the flatten() function to work.
 ## image: `<user>/<repository>:<tag>` → service: `<repository>`
 USER_ID="oxyure"
-#~ SERVICES="php-5.4.40 nginx-1.12.2 mariadb-10.1.26 centreon"
 SERVICES="mariadb centreon"
 
 function prune_docker {
