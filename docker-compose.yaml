@@ -10,39 +10,6 @@ networks:
       name: oxyure-net
 
 services:
-  #~ php-5.4.40:
-    #~ build:
-      #~ context: .
-      #~ dockerfile: php-5.4.40.Dockerfile
-    #~ depends_on:
-     #~ - mariadb-10.1.26
-    #~ image: oxyure/php-5.4.40:latest
-    #~ entrypoint:
-     #~ - /sbin/tini
-     #~ - /entrypoint
-    #~ container_name: php-fpm
-    #~ hostname: php-fpm
-    #~ networks:
-      #~ oxyure-net:
-          #~ ipv4_address: "172.30.0.40"
-
-  #~ nginx-1.12.2:
-    #~ build:
-      #~ context: .
-      #~ dockerfile: nginx-1.12.2.Dockerfile
-    #~ depends_on:
-     #~ - php-5.4.40
-     #~ - mariadb-10.1.26
-    #~ image: oxyure/nginx-1.12.2:latest
-    #~ entrypoint:
-     #~ - /sbin/tini
-     #~ - /entrypoint
-    #~ container_name: nginx
-    #~ hostname: nginx
-    #~ networks:
-      #~ oxyure-net:
-          #~ ipv4_address: "172.30.0.41"
-
   mariadb:
     build:
       context: .
