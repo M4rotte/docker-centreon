@@ -21,9 +21,11 @@ RUN echo -e "[main]\nenabled=0" > /etc/yum/pluginconf.d/fastestmirror.conf &&\
                    dmidecode perl-Net-SNMP net-snmp-perl fping cpp gcc gcc-c++ libstdc++ glib2-devel glibc-static \
                    php-pear nagios-plugins redhat-lsb-core sendmail mailx sudo perl net-snmp-perl perl-XML-LibXML \
                    perl-JSON perl-libwww-perl perl-XML-XPath perl-Net-Telnet perl-Net-DNS perl-DBI perl-DBD-MySQL perl-DBD-Pg \
-                   perl-File-Find-Object perl-Pod-Parser &&\
+                   perl-File-Find-Object perl-Pod-Parser which openssh-clients php-pear-DB php-pear-DB-DataObject \
+                   php-pear-DB-DataObject-FormBuilder php-pear-MDB2 php-pear-Date php-pear-Auth-SASL php-pear-Validate \
+                   php-pear-Log php-intl perl-Sys-Syslog qt-mysql &&\
     pear channel-update pear.php.net &&\
-    pear --force upgrade-all &&\
+    pear upgrade-all &&\
     pear channel-update pear.php.net &&\
     yum clean all
 
@@ -32,6 +34,20 @@ RUN cd /tmp &&\
     git clone https://github.com/krallin/tini.git &&\
     cd tini && cmake . && make && cp tini /sbin &&\
     cd /tmp && rm -rf tini
+
+## Do the configuration which is usually done by the install.sh Centreon script
+RUN adduser -d /var/lib/centreon-engine -s /bin/bash -r centreon-engine &&\
+    adduser -d /var/spool/centreon-broker -s /bin/bash -r centreon-broker &&\
+    adduser -d /var/spool/centreon -s /bin/bash -r centreon &&\
+    mkdir /var/log/centreon-engine && chown centreon-engine:centreon-engine /var/log/centreon-engine &&\
+    mkdir /var/log/centreon-broker && chown centreon-broker:centreon-broker /var/log/centreon-broker &&\
+    mkdir /etc/centreon-engine && chown centreon-engine:centreon-engine /etc/centreon-engine &&\
+    mkdir /etc/centreon-broker && chown centreon-broker:centreon-broker /etc/centreon-broker &&\
+    mkdir /usr/local/centreon && chown centreon:centreon /usr/local/centreon &&\
+    mkdir -p /usr/local/lib/centreon/plugins && chown centreon-engine:centreon /usr/local/lib/centreon/plugins &&\
+    mkdir /var/lib/centreon-broker && chown centreon-broker:centreon-broker /var/lib/centreon-broker &&\
+
+
 
 ## Build and install Centreon ##
 WORKDIR /tmp
@@ -44,13 +60,16 @@ RUN git clone https://github.com/centreon/centreon-clib.git &&\
     git clone https://github.com/centreon/centreon-engine.git &&\
     cd centreon-engine && cd build && cmake . && make -j3 && make install &&\
     cd /usr/local/src &&\
-    git clone https://github.com/centreon/centreon.git
-
-## Uninstall some packages ##
-RUN yum -y erase git make cmake gcc gcc-c++ glibc-devel rrdtool-devel qt-devel gnutls-devel \
-                 glib2-devel glibc-devel glibc-static fontconfig-devel libjpeg-devel libpng-devel gd-devel \
-                 rrdtool-devel qt-devel gnutls-devel openssl-devel &&\
-    yum -y autoremove
+    git clone https://github.com/centreon/centreon.git &&\
+    git clone https://github.com/centreon/centreon-plugins.git &&\
+    cd centreon-plugins && cp -a . /usr/local/lib/centreon/plugins
+    
+    
+######## Uninstall some packages ##
+######RUN yum -y erase git make cmake gcc gcc-c++ glibc-devel rrdtool-devel qt-devel gnutls-devel \
+######                 glib2-devel glibc-devel glibc-static fontconfig-devel libjpeg-devel libpng-devel gd-devel \
+######                 rrdtool-devel qt-devel gnutls-devel openssl-devel &&\
+######    yum -y autoremove
 
 ## Clean the room ##
 ## Add some information in the MOTD file ##

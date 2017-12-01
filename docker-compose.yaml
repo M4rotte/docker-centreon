@@ -5,9 +5,9 @@ volumes:
   var-spool-centreon:
 
 networks:
-  oxyure-net:
+  centreon-net:
     external:
-      name: oxyure-net
+      name: centreon-net
 
 services:
   mariadb:
@@ -27,7 +27,7 @@ services:
     container_name: mariadb
     hostname: mariadb
     networks:
-      oxyure-net:
+      centreon-net:
           ipv4_address: "172.30.0.42"
     volumes:
      - var-lib-mysql:/var/lib/mysql
@@ -51,7 +51,7 @@ services:
     container_name: centreon
     hostname: centreon
     networks:
-      oxyure-net:
+      centreon-net:
           ipv4_address: "172.30.0.100"
     ports:
      - "5555:80"

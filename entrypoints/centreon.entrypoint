@@ -16,7 +16,7 @@ ps -Hef |tail -n +2
 sed -i -e 's/#ServerName www\.example\.com:80/ServerName '"${SERVER_HOSTNAME}"':80/' \
        -e 's/DocumentRoot "\/var\/www\/html"/DocumentRoot "\/var\/www"/' \
        -e '/\<Directory "\/var\/www">/{N;N;N;N;d}' \
-       -e 's/\<Directory "\/var\/www\/html"\>/\<Directory "\/var\/www"\>/' \
+       -e 's/<Directory "\/var\/www\/html">/<Directory "\/var\/www">/' \
        -e 's/# Allow open access:/Options Indexes FollowSymLinks/' \
        /etc/httpd/conf/httpd.conf
        chown -R apache:apache /var/www &&\
@@ -36,16 +36,20 @@ sed -i -e "s/\;date.timezone =/date.timezone = Europe\/Paris/" /etc/php.ini
 echo -e "<?php phpinfo(); ?>\n" > /var/www/index.php
 chmod -R u+rwx /var/www/index.php
 
-apache_stop()   { echo " * Apache is shutting down…"; /usr/sbin/httpd -k graceful-stop; }
-apache_reload() { echo " * Apache is re-loading its configuration…"; /usr/sbin/httpd -k reload; }
+#~ apache_stop()   { echo " * Apache is shutting down…"; /usr/sbin/httpd -k graceful-stop; }
+#~ apache_restart() { echo " * Apache is re-starting…"; /usr/sbin/httpd -k restart; }
 
-trap apache_stop 2 15
-trap apache_reload 1
+#~ trap apache_stop 2 15
+#~ trap apache_restart 1
 
 echo -e " * Starting Centreon engine… \n"
-exec /usr/local/bin/centengine /usr/local/etc/centengine.cfg &
+/usr/local/bin/centengine /usr/local/etc/centengine.cfg &
+
+echo -e " * Starting Centreon Core… \n"
+/usr/local/centreon/bin/centcore &
+
 echo -e " * Starting Apache… \n"
-exec /usr/sbin/httpd -e debug -DFOREGROUND &
+/usr/sbin/httpd
 
 tail -f /dev/null
 
