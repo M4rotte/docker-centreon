@@ -5,10 +5,13 @@ set -e
 while [ -z "${SERVER_HOSTNAME}" ]; do SERVER_HOSTNAME="$(hostname)"; done
 while [ -z "${IP_ADDR}" ]; do IP_ADDR="$(hostname -i)"; done
 
-echo -e "\n######  MariaDB 10.1.26  #######"
-echo    "ADDRESS:  $IP_ADDR"
-echo    "HOSTNAME: $SERVER_HOSTNAME"
-echo -e "################################\n"
+cat <<EOF
+######  MariaDB 10.1.26  #######
+ADDRESS:  $IP_ADDR
+HOSTNAME: $SERVER_HOSTNAME
+################################
+EOF
+
 
 PID_FILE=/run/mysqld/mysqld.pid
 DATADIR=/var/lib/mysql
@@ -20,6 +23,10 @@ then
     mysql_install_db --force --skip-auth-anonymous-user --user=mysql
     (mysqld_safe --pid-file="$PID_FILE" --datadir="$DATADIR" &) &&\
     sleep 4 &&\
+    echo "Setting privileges for the Centreon server…" &&\
+    mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'centreon.centreon-net' IDENTIFIED BY \"$MARIADB_ROOT_PASSWD\" WITH GRANT OPTION" &&\
+    mysql -e "GRANT PROXY ON ''@'%' TO 'root'@'centreon.centreon-net' WITH GRANT OPTION" &&\
+    mysql -e "FLUSH PRIVILEGES" &&\
     echo "Setting MariaDB root password…" &&\
     mysqladmin -u root password "$MARIADB_ROOT_PASSWD" &&\
     kill -15 $(cat $PID_FILE) &&\

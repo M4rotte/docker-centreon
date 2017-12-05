@@ -1,0 +1,16 @@
+<centreonbroker>
+ <cbd>
+  <name><![CDATA[central-broker-master]]></name>
+  <configuration_file><![CDATA[/etc/centreon-broker/central-broker.xml]]></configuration_file>
+  <run><![CDATA[1]]></run>
+  <reload><![CDATA[1]]></reload>
+ </cbd>
+ <cbd>
+  <name><![CDATA[central-rrd-master]]></name>
+  <configuration_file><![CDATA[/etc/centreon-broker/central-rrd.xml]]></configuration_file>
+  <run><![CDATA[1]]></run>
+  <reload><![CDATA[1]]></reload>
+ </cbd>
+ <log><![CDATA[/var/log/centreon-broker/watchdog.log]]></log>
+</centreonbroker>
+

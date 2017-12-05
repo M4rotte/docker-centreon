@@ -2,7 +2,6 @@ version: "3.4"
 
 volumes:
   var-lib-mysql:
-  var-spool-centreon:
 
 networks:
   centreon-net:
@@ -28,7 +27,7 @@ services:
     hostname: mariadb
     networks:
       centreon-net:
-          ipv4_address: "172.30.0.42"
+          ipv4_address: "172.36.0.42"
     volumes:
      - var-lib-mysql:/var/lib/mysql
 
@@ -52,8 +51,7 @@ services:
     hostname: centreon
     networks:
       centreon-net:
-          ipv4_address: "172.30.0.100"
+          ipv4_address: "172.36.0.100"
     ports:
      - "5555:80"
-    volumes:
-     - var-spool-centreon:/var/spool/centreon
+
