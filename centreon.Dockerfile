@@ -34,53 +34,61 @@ RUN cd /tmp &&\
     cd tini && cmake . && make && cp tini /sbin &&\
     cd /tmp && rm -rf tini
 
-## Build and install Centreon : CLib, Broker & Engine ##
-WORKDIR /tmp
+## Build and install CLib, Broker & Engine. Get Centreon and plugins. ##
+WORKDIR /usr/local/src
 RUN git clone https://github.com/centreon/centreon-clib.git &&\
     cd centreon-clib/build && cmake . && make -j3 && make install &&\
-    cd /tmp && rm -rf centreon-clib &&\
+    cd /usr/local/src && rm -rf centreon-clib &&\
     git clone https://github.com/centreon/centreon-broker.git &&\
     cd centreon-broker && cd build && cmake . && make -j3 && make install &&\
-    cd /tmp && rm -rf centreon-broker &&\
+    cd /usr/local/src && rm -rf centreon-broker &&\
     git clone https://github.com/centreon/centreon-engine.git &&\
-    cd centreon-engine && cd build && cmake . && make -j3 && make install
+    cd centreon-engine && cd build && cmake . && make -j3 && make install &&\
+    cd /usr/local/src && rm -rf centreon-engine &&\
+    git clone https://github.com/centreon/centreon.git &&\
+    git clone https://github.com/centreon/centreon-plugins.git
 
 ## Create directories and set permissions
 RUN adduser -d /var/lib/centreon-engine -s /bin/bash -r centreon-engine &&\
     adduser -d /var/spool/centreon-broker -s /bin/bash -r centreon-broker &&\
     adduser -d /var/spool/centreon -s /bin/bash -r centreon &&\
+    usermod -a -G centreon apache &&\
     mkdir /var/log/centreon-engine && chown centreon-engine:centreon-engine /var/log/centreon-engine &&\
     mkdir /var/log/centreon-broker && chown centreon-broker:centreon-broker /var/log/centreon-broker &&\
     mkdir /var/log/centreon && chown centreon:centreon /var/log/centreon &&\
     mkdir /etc/centreon && chown centreon:centreon /etc/centreon &&\
-    mkdir /etc/centreon-engine && chown centreon-engine:centreon-engine /etc/centreon-engine &&\
-    mkdir /etc/centreon-broker && chown centreon-broker:centreon-broker /etc/centreon-broker &&\
+    mkdir /etc/centreon-engine && chown centreon-engine:centreon /etc/centreon-engine &&\
+    mkdir /etc/centreon-broker && chown centreon-broker:centreon /etc/centreon-broker &&\
     mkdir -p /usr/local/lib/centreon/plugins && chown centreon-engine:centreon /usr/local/lib/centreon/plugins &&\
     mkdir -p /usr/local/lib/nagios/plugins && chown centreon-engine:centreon /usr/local/lib/nagios/plugins &&\
     mkdir /var/lib/centreon-broker && chown centreon-broker:centreon-broker /var/lib/centreon-broker &&\
     mkdir /var/lib/centreon-engine && chown centreon-engine:centreon-engine /var/lib/centreon-engine &&\
     mkdir /var/lib/centreon && chown centreon:centreon /var/lib/centreon &&\
     mkdir /usr/share/centreon && chown centreon:centreon /usr/share/centreon &&\
-    mkdir /usr/local/nagios && chown centreon-engine:centreon /usr/local/nagios
+    mkdir /usr/local/nagios && chown centreon-engine:centreon /usr/local/nagios &&\
+    mkdir /tmp/centreon-setup
 
-
-## Build and install Centreon : Core & Plugins ##
+## Centreon : Install plugins ##
 RUN cd /usr/local/src &&\
-    git clone https://github.com/centreon/centreon.git &&\
-    git clone https://github.com/centreon/centreon-plugins.git &&\
     cp -a centreon-plugins/* /usr/local/lib/centreon/plugins &&\
     chown -R centreon-engine:centreon /usr/local/lib/centreon/plugins /usr/local/var
 
+## Default basic Apache configuration
+RUN sed -i -e 's/#ServerName www\.example\.com:80/ServerName '"${SERVER_HOSTNAME}"':80/' /etc/httpd/conf/httpd.conf &&\
+    chown -R apache:apache /var/www &&\
+    chmod -R u+rwx /var/www &&\
+    chmod -R o-rwx /var/www
+## END Apache configuration
+
 ## Configure Centreon ##
 COPY files/root/centreon-template /root
+RUN touch /etc/sudoers.d/centreon
 RUN cd /usr/local/src/centreon && ./install.sh -v -i -f /root/centreon-template
-COPY files/etc/centreon /etc/centreon
+COPY files/etc/centreon/conf.pm /etc/centreon/conf.pm
 COPY files/etc/centreon-broker /etc/centreon-broker
-
 
 RUN cp -a /usr/local/etc/centengine.cfg /etc/centreon-engine &&\
     cp -a /usr/local/etc/objects/* /etc/centreon-engine
-
 
 
 ## More configuration ##
@@ -88,10 +96,8 @@ RUN echo '/usr/local/lib' >> /etc/ld.so.conf && ldconfig
 
 
 ## Uninstall some packages ##
-RUN yum -y erase git make cmake gcc gcc-c++ glibc-devel rrdtool-devel qt-devel gnutls-devel \
-                 glib2-devel glibc-devel glibc-static fontconfig-devel libjpeg-devel libpng-devel gd-devel \
-                 rrdtool-devel qt-devel gnutls-devel openssl-devel &&\
-    yum -y autoremove &&\
+RUN yum -y erase git cmake gcc gcc-c++ glibc-devel rrdtool-devel qt-devel gnutls-devel openssl-devel \
+                 glib2-devel glibc-devel glibc-static fontconfig-devel libjpeg-devel libpng-devel gd-devel &&\
     yum clean all
 
 ## Clean the room ##

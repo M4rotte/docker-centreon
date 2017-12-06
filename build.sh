@@ -58,7 +58,7 @@ done
 echo -e "\n  ### All images have been built.\n"
 
 flatten centreon '["/sbin/tini","-v","--","/entrypoint"]' root /
-flatten mariadb  '["/sbin/tini","-v","--","/entrypoint"]' root /var/lib/mysql
+flatten mariadb  '["/sbin/tini","-v","-g","--","/entrypoint"]' root /var/lib/mysql
 
 echo -e "\n  ### All images have been flattened.\n"
 

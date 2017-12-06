@@ -1,7 +1,9 @@
 version: "3.4"
 
 volumes:
-  var-lib-mysql:
+  mariadb-var-lib-mysql:
+  centreon-etc:
+  centreon-usr-local-www:
 
 networks:
   centreon-net:
@@ -20,6 +22,7 @@ services:
     env_file: .env
     entrypoint:
      - /sbin/tini
+     - -g
      - -v
      - --
      - /entrypoint
@@ -29,7 +32,7 @@ services:
       centreon-net:
           ipv4_address: "172.36.0.42"
     volumes:
-     - var-lib-mysql:/var/lib/mysql
+     - mariadb-var-lib-mysql:/var/lib/mysql
 
   centreon:
     build:
@@ -54,4 +57,7 @@ services:
           ipv4_address: "172.36.0.100"
     ports:
      - "5555:80"
+    volumes:
+     - centreon-etc:/etc
+     - centreon-usr-local-www:/usr/local/www
 

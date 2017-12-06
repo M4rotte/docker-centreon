@@ -14,18 +14,6 @@ EOF
 
 ps -Hef |tail -n +2
 
-## Apache configuration
-sed -i -e 's/#ServerName www\.example\.com:80/ServerName '"${SERVER_HOSTNAME}"':80/' \
-       -e 's/DocumentRoot "\/var\/www\/html"/DocumentRoot "\/var\/www"/' \
-       -e '/\<Directory "\/var\/www">/{N;N;N;N;d}' \
-       -e 's/<Directory "\/var\/www\/html">/<Directory "\/var\/www">/' \
-       -e 's/# Allow open access:/Options Indexes FollowSymLinks/' \
-       /etc/httpd/conf/httpd.conf
-       chown -R apache:apache /var/www &&\
-       chmod -R u+rwx /var/www &&\
-       chmod -R o-rwx /var/www 
-## END Apache configuration
-
 
 ## PHP configuration
 sed -i -e "s/\;date.timezone =/date.timezone = Europe\/Paris/" /etc/php.ini
@@ -44,7 +32,7 @@ chmod -R u+rwx /var/www/index.php
 #~ trap apache_restart 1
 
 echo -e " * Starting Centreon Core… \n"
-su -c "/usr/bin/perl /usr/local/bin/centcore" centreon &
+su -c "/usr/bin/perl /usr/local/bin/centcore --severity=debug" centreon &
 
 echo -e " * Starting Centreon Broker… \n"
 su -c "/usr/local/bin/cbd /etc/centreon-broker/central-broker.xml" centreon-broker &

@@ -15,6 +15,7 @@ RUN apk add --no-cache tzdata &&\
 
 ## MariaDB configuration
 
+
 ## Clean the room ##
 ## Add some information in the MOTD file ##
 RUN rm -rf /var/cache/apk/* /tmp/* \
@@ -31,4 +32,4 @@ RUN chmod go-rwx /entrypoint
 
 WORKDIR /
 USER root
-ENTRYPOINT ["/sbin/tini","-v","--","/entrypoint"]
+ENTRYPOINT ["/sbin/tini","-g","-v","--","/entrypoint"]
