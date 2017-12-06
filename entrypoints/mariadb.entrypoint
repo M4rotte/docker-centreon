@@ -40,7 +40,7 @@ fi
 # Start
 echo "Starting MariaDB…"
 
-# As mysqld is not our main process it won’t get the SIGTERM which is sent when the container stops: trap it.
+# As mysqld is not our main process it won’t get the SIGTERM which is sent when the container stops, so trap it.
 mariadb_stop() { echo " * MariaDB is shutting down…"; kill -15 $(cat "$PID_FILE") ; }
 trap mariadb_stop 15
 
@@ -52,6 +52,8 @@ while [ -z "$(pidof 'mysqld')" ]; do
 done
 
 echo -e " MariaDB is running.\n"
+
+ps -ef |tail -n +2
 
 tail -f /dev/null
 

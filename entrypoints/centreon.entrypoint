@@ -12,9 +12,6 @@ HOSTNAME: $SERVER_HOSTNAME
 ################################
 EOF
 
-ps -Hef |tail -n +2
-
-
 ## PHP configuration
 sed -i -e "s/\;date.timezone =/date.timezone = Europe\/Paris/" /etc/php.ini
 ## END PHP configuration
@@ -43,6 +40,8 @@ su -c "/usr/local/bin/centengine /etc/centreon-engine/centengine.cfg" centreon-e
 
 echo -e " * Starting Apache… \n"
 /usr/sbin/httpd
+
+ps -Hef |tail -n +2
 
 tail -f /dev/null
 

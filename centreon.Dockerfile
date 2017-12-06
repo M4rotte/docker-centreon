@@ -66,12 +66,15 @@ RUN adduser -d /var/lib/centreon-engine -s /bin/bash -r centreon-engine &&\
     mkdir /var/lib/centreon && chown centreon:centreon /var/lib/centreon &&\
     mkdir /usr/share/centreon && chown centreon:centreon /usr/share/centreon &&\
     mkdir /usr/local/nagios && chown centreon-engine:centreon /usr/local/nagios &&\
-    mkdir /tmp/centreon-setup
+    mkdir /tmp/centreon-setup &&\
+    mkdir /var/tmp/centreon-engine && chown centreon-engine:centreon /var/tmp/centreon-engine &&\
+    mkdir /var/lib/centreon/metrics/ && chown centreon-broker:centreon /var/lib/centreon/metrics/ &&\
+    mkdir /var/lib/centreon/status/ && chown centreon-broker:centreon /var/lib/centreon/status/
 
 ## Centreon : Install plugins ##
 RUN cd /usr/local/src &&\
     cp -a centreon-plugins/* /usr/local/lib/centreon/plugins &&\
-    chown -R centreon-engine:centreon /usr/local/lib/centreon/plugins /usr/local/var
+    chown -R centreon-engine:centreon /usr/local/lib/centreon/plugins
 
 ## Default basic Apache configuration
 RUN sed -i -e 's/#ServerName www\.example\.com:80/ServerName '"${SERVER_HOSTNAME}"':80/' /etc/httpd/conf/httpd.conf &&\
@@ -88,12 +91,17 @@ COPY files/etc/centreon/conf.pm /etc/centreon/conf.pm
 COPY files/etc/centreon-broker /etc/centreon-broker
 
 RUN cp -a /usr/local/etc/centengine.cfg /etc/centreon-engine &&\
-    cp -a /usr/local/etc/objects/* /etc/centreon-engine
-
+    chown -R centreon-engine:centreon /etc/centreon-engine && chmod -R g+rw /etc/centreon-engine &&\
+    chown -R centreon-broker:centreon /etc/centreon-broker && chmod -R g+rw /etc/centreon-broker
 
 ## More configuration ##
-RUN echo '/usr/local/lib' >> /etc/ld.so.conf && ldconfig
+RUN echo '/usr/local/lib' >> /etc/ld.so.conf && ldconfig &&\
+    cp -a /usr/local/examples/centreon.sudo /etc/sudoers.d/centreon && chmod 0440 /etc/sudoers.d/centreon
 
+# Set Europe/Paris for timezone.
+RUN yum install tzdata &&\
+    cp /usr/share/zoneinfo/Europe/Paris /etc/localtime &&\
+    echo "Europe/Paris" > /etc/timezone
 
 ## Uninstall some packages ##
 RUN yum -y erase git cmake gcc gcc-c++ glibc-devel rrdtool-devel qt-devel gnutls-devel openssl-devel \
