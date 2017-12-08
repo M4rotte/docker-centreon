@@ -68,8 +68,9 @@ RUN adduser -d /var/lib/centreon-engine -s /bin/bash -r centreon-engine &&\
     mkdir /usr/local/nagios && chown centreon-engine:centreon /usr/local/nagios &&\
     mkdir /tmp/centreon-setup &&\
     mkdir /var/tmp/centreon-engine && chown centreon-engine:centreon /var/tmp/centreon-engine &&\
-    mkdir /var/lib/centreon/metrics/ && chown centreon-broker:centreon /var/lib/centreon/metrics/ &&\
-    mkdir /var/lib/centreon/status/ && chown centreon-broker:centreon /var/lib/centreon/status/
+    mkdir /var/lib/centreon/metrics/ && chown centreon-broker:centreon /var/lib/centreon/metrics &&\
+    mkdir /var/lib/centreon/status/ && chown centreon-broker:centreon /var/lib/centreon/status &&\
+    chown -R root:centreon /usr/local/var && chmod -R g+rwx /usr/local/var
 
 ## Centreon : Install plugins ##
 RUN cd /usr/local/src &&\

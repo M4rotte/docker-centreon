@@ -5,10 +5,10 @@ volumes:
   centreon-etc:
   centreon-usr-local-www:
 
-#~ networks:
-  #~ centreon-net:
-    #~ external:
-      #~ name: centreon-net
+networks:
+  centreon-net:
+    external:
+      name: centreon-net
 
 services:
   mariadb:
@@ -28,9 +28,9 @@ services:
      - /entrypoint
     container_name: mariadb
     hostname: mariadb
-    #~ networks:
-      #~ centreon-net:
-          #~ ipv4_address: "172.36.0.42"
+    networks:
+      centreon-net:
+          ipv4_address: "172.99.0.42"
     volumes:
      - mariadb-var-lib-mysql:/var/lib/mysql
 
@@ -52,9 +52,9 @@ services:
      - /entrypoint
     container_name: centreon
     hostname: centreon
-    #~ networks:
-      #~ centreon-net:
-          #~ ipv4_address: "172.36.0.100"
+    networks:
+      centreon-net:
+          ipv4_address: "172.99.0.100"
     ports:
      - "5555:80"
     volumes:
