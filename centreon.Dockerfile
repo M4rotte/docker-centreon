@@ -23,7 +23,7 @@ RUN echo -e "[main]\nenabled=0" > /etc/yum/pluginconf.d/fastestmirror.conf &&\
                    perl-JSON perl-libwww-perl perl-XML-XPath perl-Net-Telnet perl-Net-DNS perl-DBI perl-DBD-MySQL perl-DBD-Pg \
                    perl-File-Find-Object perl-Pod-Parser which openssh-clients php-pear-DB php-pear-DB-DataObject \
                    php-pear-DB-DataObject-FormBuilder php-pear-MDB2 php-pear-Date php-pear-Auth-SASL php-pear-Validate \
-                   php-pear-Log php-intl perl-Sys-Syslog qt-mysql &&\
+                   php-pear-Log php-intl perl-Sys-Syslog qt-mysql tzdata libssh2 libssh2-devel &&\
     pear channel-update pear.php.net &&\
     pear upgrade-all &&\
     pear channel-update pear.php.net
@@ -38,13 +38,18 @@ RUN cd /tmp &&\
 WORKDIR /usr/local/src
 RUN git clone https://github.com/centreon/centreon-clib.git &&\
     cd centreon-clib/build && cmake . && make -j3 && make install &&\
-    cd /usr/local/src && rm -rf centreon-clib &&\
+    cd /usr/local/src &&\
     git clone https://github.com/centreon/centreon-broker.git &&\
-    cd centreon-broker && cd build && cmake . && make -j3 && make install &&\
-    cd /usr/local/src && rm -rf centreon-broker &&\
+    cd centreon-broker/build && cmake . && make -j3 && make install &&\
+    cd /usr/local/src &&\
     git clone https://github.com/centreon/centreon-engine.git &&\
-    cd centreon-engine && cd build && cmake . && make -j3 && make install &&\
-    cd /usr/local/src && rm -rf centreon-engine &&\
+    cd centreon-engine/build && cmake . && make -j3 && make install
+    
+RUN cd /usr/local/src &&\
+    git clone https://github.com/centreon/centreon-connectors.git &&\
+    cd centreon-connectors/ssh/build && cmake . && make -j3 && make install &&\
+    cd ../../perl/build && cmake . && make -j3 && make install &&\
+RUN cd /usr/local/src &&\
     git clone https://github.com/centreon/centreon.git &&\
     git clone https://github.com/centreon/centreon-plugins.git
 
@@ -60,7 +65,6 @@ RUN adduser -d /var/lib/centreon-engine -s /bin/bash -r centreon-engine &&\
     mkdir /etc/centreon-engine && chown centreon-engine:centreon /etc/centreon-engine &&\
     mkdir /etc/centreon-broker && chown centreon-broker:centreon /etc/centreon-broker &&\
     mkdir -p /usr/local/lib/centreon/plugins && chown centreon-engine:centreon /usr/local/lib/centreon/plugins &&\
-    mkdir -p /usr/local/lib/nagios/plugins && chown centreon-engine:centreon /usr/local/lib/nagios/plugins &&\
     mkdir /var/lib/centreon-broker && chown centreon-broker:centreon-broker /var/lib/centreon-broker &&\
     mkdir /var/lib/centreon-engine && chown centreon-engine:centreon-engine /var/lib/centreon-engine &&\
     mkdir /var/lib/centreon && chown centreon:centreon /var/lib/centreon &&\
@@ -74,7 +78,11 @@ RUN adduser -d /var/lib/centreon-engine -s /bin/bash -r centreon-engine &&\
 ## Centreon : Install plugins ##
 RUN cd /usr/local/src &&\
     cp -a centreon-plugins/* /usr/local/lib/centreon/plugins &&\
-    chown -R centreon-engine:centreon /usr/local/lib/centreon/plugins
+    chown -R centreon-engine:centreon /usr/local/lib/centreon/plugins &&\
+    chown -R centreon-engine:centreon /usr/lib64/nagios/plugins &&\
+    chmod -R g+rx /usr/local/lib/centreon/plugins /usr/lib64/nagios/plugins &&\
+    chown root:centreon /usr/lib64/nagios/plugins/check_icmp &&\
+    chmod u+s /usr/lib64/nagios/plugins/check_icmp
 
 ## Default basic Apache configuration
 RUN sed -i -e 's/#ServerName www\.example\.com:80/ServerName '"${SERVER_HOSTNAME}"':80/' /etc/httpd/conf/httpd.conf &&\
@@ -89,6 +97,7 @@ RUN touch /etc/sudoers.d/centreon
 RUN cd /usr/local/src/centreon && ./install.sh -v -i -f /root/centreon-template
 COPY files/etc/centreon/conf.pm /etc/centreon/conf.pm
 COPY files/etc/centreon-broker /etc/centreon-broker
+#####COPY files/etc/centreon-engine /etc/centreon-engine
 
 RUN cp -a /usr/local/etc/centengine.cfg /etc/centreon-engine &&\
     chown -R centreon-engine:centreon /etc/centreon-engine && chmod -R g+rw /etc/centreon-engine &&\
@@ -99,8 +108,7 @@ RUN echo '/usr/local/lib' >> /etc/ld.so.conf && ldconfig &&\
     cp -a /usr/local/examples/centreon.sudo /etc/sudoers.d/centreon && chmod 0440 /etc/sudoers.d/centreon
 
 # Set Europe/Paris for timezone.
-RUN yum install tzdata &&\
-    cp /usr/share/zoneinfo/Europe/Paris /etc/localtime &&\
+RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime &&\
     echo "Europe/Paris" > /etc/timezone
 
 ## Uninstall some packages ##

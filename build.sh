@@ -15,7 +15,7 @@
 ## for the flatten() function to work.
 ## image: `<user>/<repository>:<tag>` → service: `<repository>`
 USER_ID="oxyure"
-SERVICES="mariadb centreon"
+SERVICES="centreondb centreon"
 
 function prune_docker {
     echo -e "\n  ### Do some cleaning…\n"
@@ -58,7 +58,7 @@ done
 echo -e "\n  ### All images have been built.\n"
 
 flatten centreon '["/sbin/tini","-v","--","/entrypoint"]' root /
-flatten mariadb  '["/sbin/tini","-v","-g","--","/entrypoint"]' root /var/lib/mysql
+flatten centreondb  '["/sbin/tini","-v","-g","--","/entrypoint"]' root /var/lib/mysql
 
 echo -e "\n  ### All images have been flattened.\n"
 

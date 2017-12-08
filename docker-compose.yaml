@@ -1,7 +1,7 @@
 version: "3.4"
 
 volumes:
-  mariadb-var-lib-mysql:
+  centreondb-var-lib-mysql:
   centreon-etc:
   centreon-usr-local-www:
 
@@ -11,14 +11,14 @@ networks:
       name: centreon-net
 
 services:
-  mariadb:
+  centreondb:
     build:
       context: .
-      dockerfile: mariadb-10.1.26.Dockerfile
+      dockerfile: centreondb.Dockerfile
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
-    image: oxyure/mariadb:latest
+    image: oxyure/centreondb:latest
     env_file: .env
     entrypoint:
      - /sbin/tini
@@ -26,13 +26,13 @@ services:
      - -v
      - --
      - /entrypoint
-    container_name: mariadb
-    hostname: mariadb
+    container_name: centreondb
+    hostname: centreondb
     networks:
       centreon-net:
-          ipv4_address: "172.99.0.42"
+          ipv4_address: "172.36.0.42"
     volumes:
-     - mariadb-var-lib-mysql:/var/lib/mysql
+     - centreondb-var-lib-mysql:/var/lib/mysql
 
   centreon:
     build:
@@ -42,7 +42,7 @@ services:
        http_proxy: ${http_proxy}
        https_proxy: ${https_proxy}
     depends_on:
-     - mariadb
+     - centreondb
     image: oxyure/centreon:latest
     env_file: .env
     entrypoint:
@@ -54,7 +54,7 @@ services:
     hostname: centreon
     networks:
       centreon-net:
-          ipv4_address: "172.99.0.100"
+          ipv4_address: "172.36.0.100"
     ports:
      - "5555:80"
     volumes:

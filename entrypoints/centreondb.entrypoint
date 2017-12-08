@@ -6,10 +6,10 @@ while [ -z "${SERVER_HOSTNAME}" ]; do SERVER_HOSTNAME="$(hostname)"; done
 while [ -z "${IP_ADDR}" ]; do IP_ADDR="$(hostname -i)"; done
 
 cat <<EOF
-######  MariaDB 10.1.26  #######
+######  Centreon database  ###
 ADDRESS:  $IP_ADDR
 HOSTNAME: $SERVER_HOSTNAME
-################################
+##############################
 EOF
 
 
@@ -40,6 +40,9 @@ fi
 # Start
 echo "Starting MariaDB…"
 
+# Unset $MARIADB_ROOT_PASSWD
+unset MARIADB_ROOT_PASSWD
+
 # As mysqld is not our main process it won’t get the SIGTERM which is sent when the container stops, so trap it.
 mariadb_stop() { echo " * MariaDB is shutting down…"; kill -15 $(cat "$PID_FILE") ; }
 trap mariadb_stop 15
@@ -53,7 +56,7 @@ done
 
 echo -e " MariaDB is running.\n"
 
-ps -ef |tail -n +2
+sleep 2 && ps -ef |tail -n +2
 
 tail -f /dev/null
 
