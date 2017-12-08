@@ -66,7 +66,6 @@ RUN adduser -d /var/lib/centreon-engine -s /bin/bash -r centreon-engine &&\
     mkdir /var/lib/centreon && chown centreon:centreon /var/lib/centreon &&\
     mkdir /usr/share/centreon && chown centreon:centreon /usr/share/centreon &&\
     mkdir /usr/local/nagios && chown centreon-engine:centreon /usr/local/nagios &&\
-    mkdir /tmp/centreon-setup &&\
     mkdir /var/tmp/centreon-engine && chown centreon-engine:centreon /var/tmp/centreon-engine &&\
     mkdir /var/lib/centreon/metrics/ && chown centreon-broker:centreon /var/lib/centreon/metrics &&\
     mkdir /var/lib/centreon/status/ && chown centreon-broker:centreon /var/lib/centreon/status &&\
