@@ -24,14 +24,15 @@ chmod -R u+rwx /var/www/index.php
 
 
 echo -e " * Starting Centreon Core… \n"
-su -c "/usr/bin/perl /usr/local/bin/centcore --severity=debug" centreon &
+su -c "/usr/bin/perl /centreon/bin/centcore --severity=debug --logfile=/var/log/centreon/centcore.log" centreon &
 
 echo -e " * Starting Centreon Broker… \n"
-su -c "/usr/local/bin/cbd /etc/centreon-broker/central-broker.xml" centreon-broker &
-su -c "/usr/local/bin/cbd /etc/centreon-broker/central-rrd.xml" centreon-broker &
+su -c "/centreon/bin/cbd /etc/centreon-broker/central-broker.xml" centreon-broker &
+su -c "/centreon/bin/cbd /etc/centreon-broker/central-rrd.xml" centreon-broker &
 
 echo -e " * Starting Centreon Engine… \n"
-su -c "/usr/local/bin/centengine /etc/centreon-engine/centengine.cfg" centreon-engine &
+#~ su -c "/centreon/bin/centengine /etc/centreon-engine/centengine.cfg" centreon-engine &
+/etc/init.d/centengine start
 
 echo -e " * Starting Apache… \n"
 /usr/sbin/httpd

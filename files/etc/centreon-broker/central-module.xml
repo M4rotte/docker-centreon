@@ -1,16 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <centreonBroker>
- <broker_id><![CDATA[3]]></broker_id>
- <broker_name><![CDATA[central-module-master]]></broker_name>
+ <broker_id><![CDATA[4]]></broker_id>
+ <broker_name><![CDATA[default-module-master]]></broker_name>
  <poller_id><![CDATA[1]]></poller_id>
  <poller_name><![CDATA[Central]]></poller_name>
- <module_directory><![CDATA[/usr/local/lib/centreon-broker]]></module_directory>
- <log_timestamp><![CDATA[0]]></log_timestamp>
- <log_thread_id><![CDATA[0]]></log_thread_id>
+ <module_directory><![CDATA[/centreon/lib/centreon-broker]]></module_directory>
+ <log_timestamp><![CDATA[1]]></log_timestamp>
+ <log_thread_id><![CDATA[1]]></log_thread_id>
  <event_queue_max_size><![CDATA[100000]]></event_queue_max_size>
  <command_file><![CDATA[]]></command_file>
- <cache_directory><![CDATA[/var/lib/centreon-engine]]></cache_directory>
+ <cache_directory><![CDATA[/var/lib/centreon-broker]]></cache_directory>
  <logger>
-  <name><![CDATA[/var/log/centreon-broker/central-module-master.log]]></name>
+  <name><![CDATA[/var/log/centreon-broker/central-module.log]]></name>
   <config><![CDATA[yes]]></config>
   <debug><![CDATA[no]]></debug>
   <error><![CDATA[yes]]></error>
@@ -19,19 +20,13 @@
   <type><![CDATA[file]]></type>
  </logger>
  <output>
-  <name><![CDATA[central-module-master-output]]></name>
+  <name><![CDATA[Central]]></name>
   <port><![CDATA[5669]]></port>
-  <host><![CDATA[localhost]]></host>
-  <retry_interval><![CDATA[60]]></retry_interval>
-  <buffering_timeout><![CDATA[0]]></buffering_timeout>
+  <host><![CDATA[127.0.0.1]]></host>
   <protocol><![CDATA[bbdo]]></protocol>
+  <negociation><![CDATA[yes]]></negociation>
   <tls><![CDATA[no]]></tls>
-  <compression><![CDATA[no]]></compression>
+  <compression><![CDATA[auto]]></compression>
   <type><![CDATA[ipv4]]></type>
  </output>
- <stats>
-  <type><![CDATA[stats]]></type>
-  <name><![CDATA[central-module-master-stats]]></name>
-  <json_fifo><![CDATA[/var/lib/centreon-engine/central-module-master-stats.json]]></json_fifo>
- </stats>
 </centreonBroker>
