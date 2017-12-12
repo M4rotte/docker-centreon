@@ -58,7 +58,7 @@ done
 echo -e "\n  ### All images have been built.\n"
 
 flatten centreon '["/sbin/tini","-v","--","/entrypoint"]' root /
-flatten centreondb  '["/sbin/tini","-v","-g","--","/entrypoint"]' root /var/lib/mysql
+flatten centreondb  '["/sbin/tini","-g","-v","--","/entrypoint"]' root /var/lib/mysql
 
 echo -e "\n  ### All images have been flattened.\n"
 
