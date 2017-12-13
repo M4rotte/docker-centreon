@@ -6,11 +6,13 @@ LABEL com.oxyure.vendor="United Microbiotas" \
       maintainer="stef@oxyure.com" \
       description="Centreon central server"
 
-ARG CENTREON_WEB_BRANCH=2.8.x
-ARG CENTREON_CLIB_BRANCH=1.4
-ARG CENTREON_ENGINE_BRANCH=2.0
-ARG CENTREON_BROKER_BRANCH=2.12
-ARG CENTREON_CONNECTORS_BRANCH=1.0
+ARG CENTREON_CLIB_BRANCH
+ARG CENTREON_ENGINE_BRANCH
+ARG CENTREON_BROKER_BRANCH
+ARG CENTREON_CONNECTORS_BRANCH
+ARG CENTREON_CENTREON_BRANCH
+ARG CENTREON_TIMEZONE
+
 
 ## Additional repositories & packages ##
 COPY files/etc/yum.repos.d /etc
@@ -51,29 +53,29 @@ RUN mkdir /centreon &&\
     mkdir /var/log/centreon && chown centreon:centreon /var/log/centreon &&\
     mkdir /etc/centreon && chown centreon:centreon /etc/centreon &&\
     mkdir /etc/centreon-engine && chown centreon-engine:centreon /etc/centreon-engine &&\
-    mkdir /etc/centreon-broker && chown centreon-broker:centreon /etc/centreon-broker &&\
-    mkdir -p /var/lib/centreon/metrics /var/lib/centreon/status && chown centreon:centreon /var/lib/centreon
+    mkdir /etc/centreon-broker && chown centreon-broker:centreon /etc/centreon-broker
+    
 
-## Build and install CLib, Broker & Engine ##
+## Build and install CLib, Broker, Engine, Connectors, Centreon, Plugins ##
 WORKDIR /usr/local/src
-RUN git clone https://github.com/centreon/centreon-clib.git && cd centreon-clib && git checkout $CENTREON_CLIB_BRANCH &&\
-    cd build && cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
-    cd /usr/local/src &&\
-    git clone https://github.com/centreon/centreon-broker.git && cd centreon-broker && git checkout $CENTREON_BROKER_BRANCH &&\
-    cd build && cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
-    cd /usr/local/src &&\
-    git clone https://github.com/centreon/centreon-engine.git && cd centreon-engine && git checkout $CENTREON_ENGINE_BRANCH &&\
-    cd build && cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install
 
-## Build and install connectors ##
-RUN cd /usr/local/src &&\
+RUN git clone https://github.com/centreon/centreon-clib.git &&\
+    cd centreon-clib && git checkout $CENTREON_CLIB_BRANCH && cd build &&\
+    cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
+    cd /usr/local/src &&\
+    git clone https://github.com/centreon/centreon-broker.git &&\
+    cd centreon-broker && git checkout $CENTREON_BROKER_BRANCH && cd build &&\ 
+    cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
+    cd /usr/local/src &&\
+    git clone https://github.com/centreon/centreon-engine.git &&\
+    cd centreon-engine && git checkout $CENTREON_ENGINE_BRANCH && cd build &&\
+    cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
+    cd /usr/local/src &&\
     git clone https://github.com/centreon/centreon-connectors.git &&\
-    cd /usr/local/src/centreon-connectors && git checkout $CENTREON_CONNECTORS_BRANCH &&\
-    cd /usr/local/src/centreon-connectors/ssh/build && cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
-    cd /usr/local/src/centreon-connectors/perl/build && cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install
-
-## Get Centreon Web and Centreon plugins
-RUN cd /usr/local/src &&\
+    cd centreon-connectors && git checkout $CENTREON_CONNECTORS_BRANCH &&\
+    cd ssh/build && cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
+    cd ../../perl/build && cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
+    cd /usr/local/src &&\
     git clone https://github.com/centreon/centreon.git &&\
     cd centreon && git checkout $CENTREON_WEB_BRANCH &&\
     cd .. &&\
@@ -97,7 +99,7 @@ RUN sed -i -e 's/#ServerName www\.example\.com:80/ServerName '"${SERVER_HOSTNAME
 
 ## Configure Centreon ##
 COPY files/root/centreon-template /root
-RUN touch /etc/sudoers.d/centreon && rm -rf /tmp/centreon-setup
+RUN touch /etc/sudoers.d/centreon
 RUN cd /usr/local/src/centreon && ./install.sh -v -i -f /root/centreon-template
 ## Set a working configuration for engine, broker and centcore.
 ## So the container may start even if Centeron is not yet configured.
@@ -110,11 +112,12 @@ RUN echo '/centreon/lib' >> /etc/ld.so.conf && ldconfig &&\
     cp -a /centreon/examples/centreon.sudo /etc/sudoers.d/centreon && chmod 0440 /etc/sudoers.d/centreon &&\
     chown -R centreon-engine:centreon /etc/centreon-engine && chmod -R g+rw /etc/centreon-engine &&\
     chown -R centreon-broker:centreon /etc/centreon-broker && chmod -R g+rw /etc/centreon-broker &&\
-    chown -R root:centreon /centreon && chmod -R g+rx /centreon && chmod -R g+w /centreon/var
+    chown -R centreon:centreon /etc/centreon && chmod -R g+rw /etc/centreon-broker &&\
+    chown -R centreon:centreon /centreon && chmod -R g+rx /centreon && chmod -R g+w /centreon/var
 
 # Set Europe/Paris for timezone.
 RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime &&\
-    echo "Europe/Paris" > /etc/timezone
+    echo "$CENTREON_TIMEZONE" > /etc/timezone
 
 ## Uninstall some packages ##
 RUN yum -y erase git cmake gcc gcc-c++ glibc-devel rrdtool-devel qt-devel gnutls-devel openssl-devel \
@@ -129,7 +132,6 @@ RUN rm -rf /var/cache/yum/* /tmp/* \
            /etc/udhcpd.conf /etc/securetty &&\
     sed -i -e "s/{build_date}/$(date)/" \
            -e "s/{build_host}/$(uname -rs)/" /etc/motd
-
 
 # Entrypoint
 COPY entrypoints/centreon.entrypoint /entrypoint

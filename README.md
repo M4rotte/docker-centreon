@@ -32,28 +32,41 @@ Running Centreon with separated PHP and Web servers, seems a bit out of hand, at
 
 In the first place, I stick to Apache for the web server. Nginx may be another good choice to consider. I find it quite simpler to configure and operate, but being unaware of how Centreon is dependent of Apache I stay with the latter. 
 
+<<<<<<< HEAD
 Centreon, in contrast, is being built from source. I’m sticking to the default branch that is `2.8.x`.
+=======
+Centreon, in contrast, is being built from source. I’m using the [sources available on GitHub](https://github.com/centreon/centreon), the branch of every component may be chosen using build arguments.
+>>>>>>> 2da070455c562885c696bd9e199dfe33e06a37d0
 
 I’m aware of the availability of Centreon packaged in RPM. While this is (very) easy to deploy a standalone, and quite outdated, Centreon solution, it’s not well suited to deploy a multi-host supervision. Beside, being able to follow the developpement of the product and mastering its deployement (what is made possible installing from the source), seems to be a useful advantage to make things done.
 
 The builds are made on the container itself (ie: there is no separate builder). I should probably change that in the futur but it’s not a priority for me (except if someone convince me of the contrary).
 
+<<<<<<< HEAD
 The image is named `centreon`
 
 ### [Centreon CLib](https://github.com/centreon/centreon-clib)
+=======
+#### [Centreon CLib](https://github.com/centreon/centreon-clib)
+>>>>>>> 2da070455c562885c696bd9e199dfe33e06a37d0
 
 This is the base part of Centreon. No particular problem to build it. On CentOS as on Alpine.
 
-### [Centreon Broker](https://github.com/centreon/centreon-broker)
+#### [Centreon Broker](https://github.com/centreon/centreon-broker)
 
 Build on Alpine (so using Musl as standard library) with many warnings. OK on CentOS with the GNU libc (and definitively faster).
 
+<<<<<<< HEAD
 ### [Centreon Engine](https://github.com/centreon/centreon-engine)
+=======
+#### [Centreon Engine](https://github.com/centreon/centreon-engine)
+>>>>>>> 2da070455c562885c696bd9e199dfe33e06a37d0
 
 The monitoring engine is independent (ie: may be used without Centreon).
 
 Using Alpine I discovered many compatibility problems in the source code. I tried to fix some, then I gave up. OK on CentOS.
 
+<<<<<<< HEAD
 ### [Centreon Connectors](https://github.com/centreon/centreon-connectors)
 
 [Can’t build](https://github.com/centreon/centreon-connectors/issues/6)
@@ -91,10 +104,51 @@ The Centreon Web’s document root
  - /etc/centreon-broker
 
 ## What’s left to do
+=======
+#### [Centreon Connectors](https://github.com/centreon/centreon-connectors)
+>>>>>>> 2da070455c562885c696bd9e199dfe33e06a37d0
 
-### [Centreon](https://github.com/centreon/centreon)
+##### Centreon Connector Perl
 
+<<<<<<< HEAD
 
+=======
+Persistent Perl interpreter that executes Perl plugins very fast.
+
+##### Centreon Connector SSH
+
+Maintain SSH connexions opened to reduce overhead of plugin execution over SSH
+
+#### Nagios plugins
+
+Legacy monitoring plugins are currently installed from the package available in the system.
+
+#### [Centreon](https://github.com/centreon/centreon)
+
+Most of the application is written in PHP. As a downside for integration, it depends on PHP < 5.5 (NB: strictly inferior)
+
+CentOS 7 is nice for this. We don’t have to install PHP from source as the distribution proposes PHP 5.4
+
+#### Centreon files and directories 
+
+All binaries related to Centreon are in /centreon (it’s used as installation prefix for all builds)
+
+ - /centreon
+ 
+As it’s used for installation, it also contains the default configurations, but we will never use those files.
+
+Configuration, logs and variable data (metrics, status) are stored in the system default directories:
+
+ - /var/lib/centreon-broker
+ - /var/lib/centreon-engine
+ - /var/lib/centreon
+ - /var/log/centreon-engine
+ - /var/log/centreon-broker
+ - /var/log/centreon
+ - /etc/centreon
+ - /etc/centreon-engine
+ - /etc/centreon-broker
+>>>>>>> 2da070455c562885c696bd9e199dfe33e06a37d0
 
 ## If this POC is successful 
 
@@ -110,6 +164,18 @@ A container for our inventory synchronization tool.
 
 ### Supervision Request
 
-A container for our supervivion requests tool.
+A container for our supervision requests tool.
+
+### Centreon installation
+
+Master all the Centreon toolchain, middleware + applications, from PHP to Centreon, by following the different upstreams and installing from source.
+
+ - PHP
+ - MariaDB
+ - RRDTool
+ - …
+ - Nagios plugins
+ - …
+
 
 

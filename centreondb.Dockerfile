@@ -13,7 +13,6 @@ RUN apk add --no-cache tzdata &&\
     echo "Europe/Paris" > /etc/timezone &&\
     apk del --purge tzdata
 
-## MariaDB configuration
 
 ## Remove some files ##
 ## Add some information in the MOTD file ##

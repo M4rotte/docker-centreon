@@ -20,6 +20,7 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
     image: oxyure/centreondb:latest
+    env_file: centreondb.env
     entrypoint:
      - /sbin/tini
      - -g
@@ -40,11 +41,18 @@ services:
       context: .
       dockerfile: centreon.Dockerfile
       args:
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
+       http_proxy: ${http_proxy}
+       https_proxy: ${https_proxy}
+       CENTREON_CLIB_BRANCH: 1.4
+       CENTREON_ENGINE_BRANCH: 2.0
+       CENTREON_BROKER_BRANCH: 2.12
+       CENTREON_CONNECTORS_BRANCH: 1.0
+       CENTREON_CENTREON_BRANCH: 2.8.x
+       CENTREON_TIMEZONE: Europe/Paris
     depends_on:
      - centreondb
     image: oxyure/centreon:latest
+    env_file: centreon.env
     entrypoint:
      - /sbin/tini
      - -v
