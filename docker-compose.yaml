@@ -12,6 +12,7 @@ networks:
 
 services:
   centreondb:
+    env_file: centreondb.env
     build:
       context: .
       dockerfile: centreondb.Dockerfile
@@ -19,7 +20,6 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
     image: oxyure/centreondb:latest
-    env_file: .env
     entrypoint:
      - /sbin/tini
      - -g
@@ -35,16 +35,16 @@ services:
      - centreondb-var-lib-mysql:/var/lib/mysql
 
   centreon:
+    env_file: centreon.env
     build:
       context: .
       dockerfile: centreon.Dockerfile
       args:
-       http_proxy: ${http_proxy}
-       https_proxy: ${https_proxy}
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
     depends_on:
      - centreondb
     image: oxyure/centreon:latest
-    env_file: .env
     entrypoint:
      - /sbin/tini
      - -v

@@ -15,7 +15,6 @@ RUN apk add --no-cache tzdata &&\
 
 ## MariaDB configuration
 
-
 ## Remove some files ##
 ## Add some information in the MOTD file ##
 RUN rm -rf /var/cache/apk/* /tmp/* \
