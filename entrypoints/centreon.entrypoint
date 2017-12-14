@@ -1,16 +1,26 @@
 #!/bin/sh
 
-set -e
+graceful_exit() {
+    echo "Was asked to terminate myself…" >&2
+    httpd -k stop
+    /etc/init.d/centengine stop
+    kill -15 $CENTREON_BROKER_RRD_PID
+    kill -15 $CENTREON_BROKER_PID
+    kill -15 $CENTREON_CORE_PID
+    echo "Centreon has been stopped." >&2
+    exit 0
+}
 
-while [ -z "${SERVER_HOSTNAME}" ]; do SERVER_HOSTNAME="$(hostname)"; done
+trap graceful_exit 2 3 15
+
 while [ -z "${IP_ADDR}" ]; do IP_ADDR="$(hostname -i)"; done
 
 cat <<EOF
 ##########  Centreon central  ##########
 ADDRESS  : $IP_ADDR
-HOSTNAME : $SERVER_HOSTNAME
+HOSTNAME : $HOSTNAME
 TIMEZONE : $(cat /etc/timezone)
-TINI     : $(tini --version)
+PHP      : $(php -v |awk '{if (NR==1) {print $1,$2}}')
 ########################################
 EOF
 
@@ -23,9 +33,14 @@ chmod -R u+rwx /var/www/index.php
 echo -e " * Starting Centreon Core… \n"
 su -c "/usr/bin/perl /centreon/bin/centcore --severity=debug --logfile=/var/log/centreon/centcore.log" centreon &
 
+CENTREON_CORE_PID=$!
+
 echo -e " * Starting Centreon Broker… \n"
 su -c "/centreon/bin/cbd /etc/centreon-broker/central-broker.xml" centreon-broker &
+CENTREON_BROKER_PID=$!
+
 su -c "/centreon/bin/cbd /etc/centreon-broker/central-rrd.xml" centreon-broker &
+CENTREON_BROKER_RRD_PID=$!
 
 echo -e " * Starting Centreon Engine… \n"
 /etc/init.d/centengine start

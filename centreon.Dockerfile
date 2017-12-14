@@ -32,12 +32,6 @@ RUN echo -e "[main]\nenabled=0" > /etc/yum/pluginconf.d/fastestmirror.conf &&\
                    perl-File-Find-Object perl-Pod-Parser which openssh-clients php-pear-DB php-pear-DB-DataObject \
                    qt-mysql tzdata libssh2-devel libgcrypt-devel php-intl perl-libintl
 
-## Build and install Tini ##
-RUN cd /tmp &&\
-    git clone https://github.com/krallin/tini.git &&\
-    cd tini && cmake . && make && cp tini /sbin &&\
-    cd /tmp && rm -rf tini
-
 ## Create directories and set permissions
 RUN mkdir /centreon &&\
     adduser -d /centreon -s /bin/bash -r centreon-engine &&\
@@ -46,14 +40,15 @@ RUN mkdir /centreon &&\
     chown centreon:centreon /centreon &&\
     usermod -a -G centreon apache &&\
     mkdir /var/lib/centreon-broker && chown centreon-broker:centreon-broker /var/lib/centreon-broker &&\
-    mkdir /var/lib/centreon-engine && chown centreon-engine:centreon-engine /var/lib/centreon-engine &&\
+    mkdir -p /var/lib/centreon-engine/rw && chown -R centreon-engine:centreon /var/lib/centreon-engine &&\
     mkdir -p /var/lib/centreon/metrics /var/lib/centreon/status && chown -R centreon:centreon /var/lib/centreon &&\
     mkdir /var/log/centreon-engine && chown centreon-engine:centreon-engine /var/log/centreon-engine &&\
     mkdir /var/log/centreon-broker && chown centreon-broker:centreon-broker /var/log/centreon-broker &&\
     mkdir /var/log/centreon && chown centreon:centreon /var/log/centreon &&\
     mkdir /etc/centreon && chown centreon:centreon /etc/centreon &&\
     mkdir /etc/centreon-engine && chown centreon-engine:centreon /etc/centreon-engine &&\
-    mkdir /etc/centreon-broker && chown centreon-broker:centreon /etc/centreon-broker
+    mkdir /etc/centreon-broker && chown centreon-broker:centreon /etc/centreon-broker &&\
+    mkdir /tmp/centreon-setup
     
 
 ## Build and install CLib, Broker, Engine, Connectors, Centreon, Plugins ##
@@ -143,4 +138,4 @@ EXPOSE 80/tcp
 
 WORKDIR /
 USER root
-ENTRYPOINT ["/sbin/tini","-v","--","/entrypoint"]
+ENTRYPOINT ["/entrypoint"]

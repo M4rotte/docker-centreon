@@ -1,16 +1,12 @@
 #!/bin/sh
 
-set -e
-
-while [ -z "${SERVER_HOSTNAME}" ]; do SERVER_HOSTNAME="$(hostname)"; done
 while [ -z "${IP_ADDR}" ]; do IP_ADDR="$(hostname -i)"; done
 
 cat <<EOF
 ##########  Centreon database  ##########
 ADDRESS  : $IP_ADDR
-HOSTNAME : $SERVER_HOSTNAME
+HOSTNAME : $HOSTNAME
 TIMEZONE : $(cat /etc/timezone)
-TINI     : $(tini --version)
 BUSYBOX  : $(busybox |head -1 |awk '{print $2}')
 MYSQLD   : $(mysqld --version |awk '{print $3}')
 #########################################
@@ -26,7 +22,7 @@ then
     mysql_install_db --force --skip-auth-anonymous-user --user=mysql
     (mysqld_safe --pid-file="$PID_FILE" --datadir="$DATADIR" &) &&\
     sleep 4 &&\
-    # Authorize root to connect from a host named "centreon". This is needed by the Centreon setup process and may be removed afterward.
+    # Authorize root for the host named "centreon". This is needed by the Centreon setup process and may be removed afterward.
     echo "Setting privileges for the Centreon server…" &&\
     mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'centreon.%' IDENTIFIED BY \"$MARIADB_ROOT_PASSWD\" WITH GRANT OPTION" &&\
     mysql -e "GRANT PROXY ON ''@'%' TO 'root'@'centreon.%' WITH GRANT OPTION" &&\
