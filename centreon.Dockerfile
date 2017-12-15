@@ -47,8 +47,7 @@ RUN mkdir /centreon &&\
     mkdir /var/log/centreon && chown centreon:centreon /var/log/centreon &&\
     mkdir /etc/centreon && chown centreon:centreon /etc/centreon &&\
     mkdir /etc/centreon-engine && chown centreon-engine:centreon /etc/centreon-engine &&\
-    mkdir /etc/centreon-broker && chown centreon-broker:centreon /etc/centreon-broker &&\
-    mkdir /tmp/centreon-setup
+    mkdir /etc/centreon-broker && chown centreon-broker:centreon /etc/centreon-broker
     
 
 ## Build and install CLib, Broker, Engine, Connectors, Centreon, Plugins ##
@@ -93,11 +92,14 @@ RUN sed -i -e 's/#ServerName www\.example\.com:80/ServerName '"${SERVER_HOSTNAME
 ## END Apache configuration
 
 ## Configure Centreon ##
+## Most of the configuration is done by the Centreon setup script.
+## We also set a working configuration for engine, broker and centcore.
+## So the processes can start even if Centreon is not yet configured.
 COPY files/root/centreon-template /root
-RUN touch /etc/sudoers.d/centreon
-RUN cd /usr/local/src/centreon && ./install.sh -v -i -f /root/centreon-template
-## Set a working configuration for engine, broker and centcore.
-## So the container may start even if Centeron is not yet configured.
+RUN touch /etc/sudoers.d/centreon &&\
+    cd /usr/local/src/centreon &&\
+    ./install.sh -v -i -f /root/centreon-template
+
 COPY files/etc/centreon/conf.pm /etc/centreon/conf.pm
 COPY files/etc/centreon-broker /etc/centreon-broker
 COPY files/etc/centreon-engine/* /etc/centreon-engine/
@@ -122,7 +124,7 @@ RUN yum -y erase git cmake gcc gcc-c++ glibc-devel rrdtool-devel qt-devel gnutls
 ## Remove some files ##
 ## Add some information in the MOTD file ##
 COPY files/etc/motd-centreon /etc/motd
-RUN rm -rf /var/cache/yum/* /tmp/* \
+RUN rm -rf /var/cache/yum/* \
            /etc/modprobe.d /etc/modules-load.d /etc/modules \
            /etc/udhcpd.conf /etc/securetty &&\
     sed -i -e "s/{build_date}/$(date)/" \

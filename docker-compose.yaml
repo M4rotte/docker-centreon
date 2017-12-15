@@ -20,12 +20,7 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
     image: oxyure/centreondb:latest
-    env_file: centreondb.env
     entrypoint:
-     - /sbin/tini
-     - -g
-     - -v
-     - --
      - /entrypoint
     container_name: centreondb
     hostname: centreondb
@@ -43,20 +38,16 @@ services:
       args:
        http_proxy: ${http_proxy}
        https_proxy: ${https_proxy}
-       CENTREON_CLIB_BRANCH: 1.4
-       CENTREON_ENGINE_BRANCH: 2.0
-       CENTREON_BROKER_BRANCH: 2.12
-       CENTREON_CONNECTORS_BRANCH: 1.0
-       CENTREON_CENTREON_BRANCH: 2.8.x
-       CENTREON_TIMEZONE: Europe/Paris
+       CENTREON_CLIB_BRANCH: ${CENTREON_CLIB_BRANCH}
+       CENTREON_ENGINE_BRANCH: ${CENTREON_ENGINE_BRANCH}
+       CENTREON_BROKER_BRANCH: ${CENTREON_BROKER_BRANCH}
+       CENTREON_CONNECTORS_BRANCH: ${CENTREON_CONNECTORS_BRANCH}
+       CENTREON_CENTREON_BRANCH: ${CENTREON_CENTREON_BRANCH}
+       CENTREON_TIMEZONE: ${CENTREON_TIMEZONE}
     depends_on:
      - centreondb
     image: oxyure/centreon:latest
-    env_file: centreon.env
     entrypoint:
-     - /sbin/tini
-     - -v
-     - --
      - /entrypoint
     container_name: centreon
     hostname: centreon

@@ -26,6 +26,8 @@ then
     echo "Setting privileges for the Centreon server…" &&\
     mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'centreon.%' IDENTIFIED BY \"$MARIADB_ROOT_PASSWD\" WITH GRANT OPTION" &&\
     mysql -e "GRANT PROXY ON ''@'%' TO 'root'@'centreon.%' WITH GRANT OPTION" &&\
+    mysql -e "GRANT ALL PRIVILEGES ON centreon.* TO 'centreon'@'centreon.%' IDENTIFIED BY \"$CENTREON_DB_PASSWD\"" &&\
+    mysql -e "GRANT ALL PRIVILEGES ON centreon_storage.* TO 'centreon'@'centreon.%' IDENTIFIED BY \"$CENTREON_DB_PASSWD\"" &&\
     mysql -e "FLUSH PRIVILEGES" &&\
     echo "Setting MariaDB root password…" &&\
     mysqladmin -u root password "$MARIADB_ROOT_PASSWD" &&\

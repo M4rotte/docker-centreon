@@ -47,6 +47,10 @@ function flatten {
     docker rm "$RANDNAME"
 }
 
+echo -e "\n  *** Centreon docker images creation ***\n"
+
+grep ^CENTREON .env
+
 for service in ${SERVICES}; do
 
     echo -e "\n  ### Building image \"${service}\"…\n"
@@ -57,8 +61,8 @@ done
 
 echo -e "\n  ### All images have been built.\n"
 
-flatten centreon '["/sbin/tini","-v","--","/entrypoint"]' root /
-flatten centreondb  '["/sbin/tini","-g","-v","--","/entrypoint"]' root /var/lib/mysql
+#~ flatten centreon '["/entrypoint"]' root /
+#~ flatten centreondb  '["/entrypoint"]' root /var/lib/mysql
 
 echo -e "\n  ### All images have been flattened.\n"
 
