@@ -39,6 +39,8 @@ RUN mkdir /centreon &&\
     adduser -d /centreon -s /bin/bash -r centreon &&\
     chown centreon:centreon /centreon &&\
     usermod -a -G centreon apache &&\
+    usermod -a -G centreon centreon-engine &&\
+    usermod -a -G centreon centreon-broker &&\
     mkdir /var/lib/centreon-broker && chown centreon-broker:centreon-broker /var/lib/centreon-broker &&\
     mkdir -p /var/lib/centreon-engine/rw && chown -R centreon-engine:centreon /var/lib/centreon-engine &&\
     mkdir -p /var/lib/centreon/metrics /var/lib/centreon/status && chown -R centreon:centreon /var/lib/centreon &&\
@@ -48,7 +50,6 @@ RUN mkdir /centreon &&\
     mkdir /etc/centreon && chown centreon:centreon /etc/centreon &&\
     mkdir /etc/centreon-engine && chown centreon-engine:centreon /etc/centreon-engine &&\
     mkdir /etc/centreon-broker && chown centreon-broker:centreon /etc/centreon-broker
-    
 
 ## Build and install CLib, Broker, Engine, Connectors, Centreon, Plugins ##
 WORKDIR /usr/local/src
@@ -71,7 +72,7 @@ RUN git clone https://github.com/centreon/centreon-clib.git &&\
     cd ../../perl/build && cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
     cd /usr/local/src &&\
     git clone https://github.com/centreon/centreon.git &&\
-    cd centreon && git checkout $CENTREON_WEB_BRANCH &&\
+    cd centreon && git checkout $CENTREON_CENTREON_BRANCH &&\
     cd .. &&\
     git clone https://github.com/centreon/centreon-plugins.git
 
@@ -103,6 +104,7 @@ RUN touch /etc/sudoers.d/centreon &&\
 COPY files/etc/centreon/conf.pm /etc/centreon/conf.pm
 COPY files/etc/centreon-broker /etc/centreon-broker
 COPY files/etc/centreon-engine/* /etc/centreon-engine/
+COPY files/etc/init.d/centengine /etc/init.d/centengine
 
 ## More configuration ##
 RUN echo '/centreon/lib' >> /etc/ld.so.conf && ldconfig &&\

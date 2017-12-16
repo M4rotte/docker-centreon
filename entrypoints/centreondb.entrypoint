@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 while [ -z "${IP_ADDR}" ]; do IP_ADDR="$(hostname -i)"; done
 
@@ -41,14 +41,15 @@ fi
 # Start
 echo "Starting MariaDB…"
 
-# Unset $MARIADB_ROOT_PASSWD
+# Unset somme variables
 export MARIADB_ROOT_PASSWD=''
+export CENTREON_DB_PASSWD=''
 
 # As mysqld is not our main process it won’t get the SIGTERM which is sent when the container stops, so trap it.
 mariadb_stop() { echo " * MariaDB is shutting down…"; kill -15 $(cat "$PID_FILE") ; }
-trap mariadb_stop 2 15
+trap mariadb_stop 2 3 15 19
 
-exec mysqld_safe --pid-file="$PID_FILE" --datadir="$DATADIR" --log-error="mariadb.err" --user=mysql &
+mysqld_safe --pid-file="$PID_FILE" --datadir="$DATADIR" --log-error="mariadb.err" --user=mysql &
 
 while [ -z "$(pidof 'mysqld')" ]; do
     sleep 1
