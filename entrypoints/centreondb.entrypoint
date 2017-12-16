@@ -47,7 +47,7 @@ export CENTREON_DB_PASSWD=''
 
 # As mysqld is not our main process it won’t get the SIGTERM which is sent when the container stops, so trap it.
 mariadb_stop() { echo " * MariaDB is shutting down…"; kill -15 $(cat "$PID_FILE") ; }
-trap mariadb_stop 2 3 15 19
+trap mariadb_stop 15
 
 mysqld_safe --pid-file="$PID_FILE" --datadir="$DATADIR" --log-error="mariadb.err" --user=mysql &
 
