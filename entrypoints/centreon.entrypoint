@@ -57,7 +57,7 @@ echo PID for cbd-rrd    : $CENTREON_BROKER_RRD_PID
 
 sleep 2 && ps -Hef |tail -n +2
 
-tail -f /dev/null
+wait
 
 
 
