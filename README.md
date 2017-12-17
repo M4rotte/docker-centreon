@@ -16,13 +16,27 @@ One of the goals of this work is to learn Docker, and getting a better knowledge
 
 ## What is done so far
 
-A central image with CLib, CentreonBroker, Centreon Engine and Centreon Web. The setup (install.sh) is done but the Centreon configuration itself must be done once the container is running.
+A central image with CLib, Broker, Engine, Connectors and Centreon Web. The setup (install.sh) is done during image creation but the Centreon configuration itself must be realized once the container is running. Having `/etc` being a Docker volume the configuration will then persist across container restarts.
+
+<aside class="notice">
+Once the setup has took place, you must manually rename the `/centreon/www/install` directory (as `/centreon/www/install.done` for example) to prevent the installation to restart again and again. This may be a bug, I don’t know.
+</aside>
 
 ### Database image
 
 It’s based on Alpine and it’s not as complete as the Debian based official MariaDB docker image. To run Centreon you may (and probably should) use the official image for your backend.
 
 MariaDB is installed from the packages available in Alpine 3.6. The image is named `centreondb`.
+
+If `/var/lib/mysql/mysql` is not a directory then MariaDB is run once to:
+
+ 1) execute its initial configuration
+ 2) set the root password (from an env. variable)
+ 3) set grants necessary for root to connect from the central with password
+ 
+Then (or if the server is already configured) MariaDB is run to listen to requests.
+
+The `mysqld` process is killed with SIGTERM (so is gracefuly terminated) whatever the container receive SIGINT, SIGTERM, SIGQUIT or SIGSTOP.
 
 ### Central image
 
@@ -32,23 +46,17 @@ Running Centreon with separated PHP and Web servers, seems a bit out of hand, at
 
 In the first place, I stick to Apache for the web server. Nginx may be another good choice to consider. I find it quite simpler to configure and operate, but being unaware of how Centreon is dependent of Apache I stay with the latter. 
 
-<<<<<<< HEAD
-Centreon, in contrast, is being built from source. I’m sticking to the default branch that is `2.8.x`.
-=======
+
 Centreon, in contrast, is being built from source. I’m using the [sources available on GitHub](https://github.com/centreon/centreon), the branch of every component may be chosen using build arguments.
->>>>>>> 2da070455c562885c696bd9e199dfe33e06a37d0
 
 I’m aware of the availability of Centreon packaged in RPM. While this is (very) easy to deploy a standalone, and quite outdated, Centreon solution, it’s not well suited to deploy a multi-host supervision. Beside, being able to follow the developpement of the product and mastering its deployement (what is made possible installing from the source), seems to be a useful advantage to make things done.
 
 The builds are made on the container itself (ie: there is no separate builder). I should probably change that in the futur but it’s not a priority for me (except if someone convince me of the contrary).
 
-<<<<<<< HEAD
 The image is named `centreon`
 
 ### [Centreon CLib](https://github.com/centreon/centreon-clib)
-=======
-#### [Centreon CLib](https://github.com/centreon/centreon-clib)
->>>>>>> 2da070455c562885c696bd9e199dfe33e06a37d0
+
 
 This is the base part of Centreon. No particular problem to build it. On CentOS as on Alpine.
 
@@ -56,17 +64,14 @@ This is the base part of Centreon. No particular problem to build it. On CentOS 
 
 Build on Alpine (so using Musl as standard library) with many warnings. OK on CentOS with the GNU libc (and definitively faster).
 
-<<<<<<< HEAD
-### [Centreon Engine](https://github.com/centreon/centreon-engine)
-=======
+
 #### [Centreon Engine](https://github.com/centreon/centreon-engine)
->>>>>>> 2da070455c562885c696bd9e199dfe33e06a37d0
+
 
 The monitoring engine is independent (ie: may be used without Centreon).
 
 Using Alpine I discovered many compatibility problems in the source code. I tried to fix some, then I gave up. OK on CentOS.
 
-<<<<<<< HEAD
 ### [Centreon Connectors](https://github.com/centreon/centreon-connectors)
 
 [Can’t build](https://github.com/centreon/centreon-connectors/issues/6)
@@ -104,15 +109,9 @@ The Centreon Web’s document root
  - /etc/centreon-broker
 
 ## What’s left to do
-=======
-#### [Centreon Connectors](https://github.com/centreon/centreon-connectors)
->>>>>>> 2da070455c562885c696bd9e199dfe33e06a37d0
 
 ##### Centreon Connector Perl
 
-<<<<<<< HEAD
-
-=======
 Persistent Perl interpreter that executes Perl plugins very fast.
 
 ##### Centreon Connector SSH
@@ -148,7 +147,6 @@ Configuration, logs and variable data (metrics, status) are stored in the system
  - /etc/centreon
  - /etc/centreon-engine
  - /etc/centreon-broker
->>>>>>> 2da070455c562885c696bd9e199dfe33e06a37d0
 
 ## If this POC is successful 
 

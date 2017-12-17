@@ -49,7 +49,8 @@ RUN mkdir /centreon &&\
     mkdir /var/log/centreon && chown centreon:centreon /var/log/centreon &&\
     mkdir /etc/centreon && chown centreon:centreon /etc/centreon &&\
     mkdir /etc/centreon-engine && chown centreon-engine:centreon /etc/centreon-engine &&\
-    mkdir /etc/centreon-broker && chown centreon-broker:centreon /etc/centreon-broker
+    mkdir /etc/centreon-broker && chown centreon-broker:centreon /etc/centreon-broker &&\
+    mkdir /tmp/centreon-setup && chown centreon:centreon /tmp/centreon-setup && chmod g+rwx /tmp/centreon-setup
 
 ## Build and install CLib, Broker, Engine, Connectors, Centreon, Plugins ##
 WORKDIR /usr/local/src
@@ -112,7 +113,7 @@ RUN echo '/centreon/lib' >> /etc/ld.so.conf && ldconfig &&\
     chown -R centreon-engine:centreon /etc/centreon-engine && chmod -R g+rw /etc/centreon-engine &&\
     chown -R centreon-broker:centreon /etc/centreon-broker && chmod -R g+rw /etc/centreon-broker &&\
     chown -R centreon:centreon /etc/centreon && chmod -R g+rw /etc/centreon-broker &&\
-    chown -R centreon:centreon /centreon && chmod -R g+rx /centreon && chmod -R g+w /centreon/var
+    chown -R centreon:centreon /centreon && chmod -R g+rx /centreon && chmod -R g+w /centreon/www
 
 # Set Europe/Paris for timezone.
 RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime &&\
