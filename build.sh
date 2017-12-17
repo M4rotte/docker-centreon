@@ -61,8 +61,8 @@ done
 
 echo -e "\n  ### All images have been built.\n"
 
-#~ flatten centreon '["/entrypoint"]' root /
-#~ flatten centreondb  '["/entrypoint"]' root /var/lib/mysql
+flatten centreon '["/entrypoint"]' root /
+flatten centreondb  '["/entrypoint"]' root /
 
 echo -e "\n  ### All images have been flattened.\n"
 

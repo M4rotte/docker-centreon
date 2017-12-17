@@ -24,7 +24,7 @@ RUN echo -e "[main]\nenabled=0" > /etc/yum/pluginconf.d/fastestmirror.conf &&\
     yum -y install binutils git make cmake glibc-devel rrdtool-devel qt-devel gnutls-devel perl-ExtUtils-Embed \
                    httpd gd fontconfig-devel libjpeg-devel libpng-devel gd-devel perl-GD perl-DateTime perl-Sys-Syslog \
                    openssl-devel perl-DBD-MySQL php php-mysql php-gd php-ldap php-xml php-mbstring \
-                   perl-Config-IniFiles perl-DBI perl-DBD-MySQL perl-rrdtool perl-Crypt-DES perl-Digest-SHA1 \
+                   perl-Config-IniFiles perl-DBI perl-JSON-XS perl-DBD-MySQL perl-rrdtool perl-Crypt-DES perl-Digest-SHA1 \
                    perl-Digest-HMAC net-snmp-utils perl-Socket6 perl-IO-Socket-INET6 net-snmp net-snmp-libs php-snmp \
                    dmidecode perl-Net-SNMP net-snmp-perl fping cpp gcc gcc-c++ libstdc++ glib2-devel glibc-static \
                    php-pear nagios-plugins-all redhat-lsb-core sendmail mailx sudo perl net-snmp-perl perl-XML-LibXML \
@@ -45,7 +45,7 @@ RUN mkdir /centreon &&\
     mkdir -p /var/lib/centreon-engine/rw && chown -R centreon-engine:centreon /var/lib/centreon-engine &&\
     mkdir -p /var/lib/centreon/metrics /var/lib/centreon/status && chown -R centreon:centreon /var/lib/centreon &&\
     mkdir /var/log/centreon-engine && chown centreon-engine:centreon-engine /var/log/centreon-engine &&\
-    mkdir /var/log/centreon-broker && chown centreon-broker:centreon-broker /var/log/centreon-broker &&\
+    mkdir /var/log/centreon-broker && chown centreon-broker:centreon /var/log/centreon-broker && chmod g+rwx /var/log/centreon-broker &&\
     mkdir /var/log/centreon && chown centreon:centreon /var/log/centreon &&\
     mkdir /etc/centreon && chown centreon:centreon /etc/centreon &&\
     mkdir /etc/centreon-engine && chown centreon-engine:centreon /etc/centreon-engine &&\
@@ -82,8 +82,8 @@ RUN cd /usr/local/src && mkdir /centreon/plugins &&\
     chown -R centreon-engine:centreon /centreon/plugins &&\
     chown -R centreon-engine:centreon /usr/lib64/nagios/plugins &&\
     chmod -R g+rx /centreon/plugins /usr/lib64/nagios/plugins &&\
-    chown root:centreon /usr/lib64/nagios/plugins/check_icmp &&\
-    chmod u+s /usr/lib64/nagios/plugins/check_icmp
+    chown root:root /usr/lib64/nagios/plugins/check_icmp &&\
+    chmod ug+s /usr/lib64/nagios/plugins/check_icmp
 
 ## Default basic Apache configuration
 RUN sed -i -e 's/#ServerName www\.example\.com:80/ServerName '"${SERVER_HOSTNAME}"':80/' /etc/httpd/conf/httpd.conf &&\

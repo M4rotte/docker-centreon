@@ -6,6 +6,7 @@ graceful_exit() {
     /etc/init.d/centengine stop
     kill -15 $CENTREON_BROKER_RRD_PID
     kill -15 $CENTREON_BROKER_PID
+    #~ /etc/init.d/centcore stop
     kill -15 $CENTREON_CORE_PID
     echo "Centreon has been stopped." >&2
     exit 0
@@ -32,8 +33,8 @@ echo -e "<?php phpinfo(); ?>\n" > /var/www/php.php
 chmod -R u+rwx /var/www/php.php
 
 echo -e " * Starting Centreon Core… \n"
-su -c "/usr/bin/perl /centreon/bin/centcore --severity=debug --logfile=/var/log/centreon/centcore.log" centreon &
-
+#~ /etc/init.d/centcore
+su -c "/usr/bin/perl /centreon/bin/centcore --logfile=/var/log/centreon/centcore.log --severity=debug --config=/etc/centreon/conf.pm" centreon &
 CENTREON_CORE_PID=$!
 
 echo -e " * Starting Centreon Broker… \n"
