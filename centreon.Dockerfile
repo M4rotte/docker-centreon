@@ -56,24 +56,24 @@ RUN mkdir /centreon &&\
 WORKDIR /usr/local/src
 
 RUN git clone https://github.com/centreon/centreon-clib.git &&\
-    cd centreon-clib && git checkout $CENTREON_CLIB_BRANCH && cd build &&\
+    cd centreon-clib && git checkout $CENTREON_CLIB_VERSION && cd build &&\
     cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
     cd /usr/local/src &&\
     git clone https://github.com/centreon/centreon-broker.git &&\
-    cd centreon-broker && git checkout $CENTREON_BROKER_BRANCH && cd build &&\ 
+    cd centreon-broker && git checkout $CENTREON_BROKER_VERSION && cd build &&\ 
     cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
     cd /usr/local/src &&\
     git clone https://github.com/centreon/centreon-engine.git &&\
-    cd centreon-engine && git checkout $CENTREON_ENGINE_BRANCH && cd build &&\
+    cd centreon-engine && git checkout $CENTREON_ENGINE_VERSION && cd build &&\
     cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
     cd /usr/local/src &&\
     git clone https://github.com/centreon/centreon-connectors.git &&\
-    cd centreon-connectors && git checkout $CENTREON_CONNECTORS_BRANCH &&\
+    cd centreon-connectors && git checkout $CENTREON_CONNECTORS_VERSION &&\
     cd ssh/build && cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
     cd ../../perl/build && cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
     cd /usr/local/src &&\
     git clone https://github.com/centreon/centreon.git &&\
-    cd centreon && git checkout $CENTREON_CENTREON_BRANCH &&\
+    cd centreon && git checkout $CENTREON_CENTREON_VERSION &&\
     cd .. &&\
     git clone https://github.com/centreon/centreon-plugins.git
 

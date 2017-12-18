@@ -22,7 +22,7 @@ Once the setup has took place, you must manually rename the '/centreon/www/insta
 
 It’s based on Alpine and it’s not as complete as the Debian based official MariaDB docker image. To run Centreon you may (and probably should) use the official image as your backend.
 
-MariaDB is installed from the packages available in Alpine 3.6. The image is named 'centreondb'.
+MariaDB is installed from the packages available in Alpine 3.6 (MariaDB version is 10.1.26). The image is named 'centreondb'.
 
 If '/var/lib/mysql/mysql' is not a directory then MariaDB is run once to:
 
