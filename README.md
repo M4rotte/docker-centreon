@@ -1,10 +1,8 @@
 # Centreon Docker images
 
-This is a "work in progress" project. It’s not usuable so far.
+This is a "work in progress" project. The v0.1 offer a minimal working setup, with one central/poller image and one database image.
 
-Despite having "alpine" in its name, this project makes only a little use of Alpine Linux. I gave up with the idea of building the Centreon stack under this distribution, only the MariaDB database image is made from the Alpine official image.
-
-I’m currently trying to build the last Centreon source code using the CentOS 7 image.
+The Centreon central image is based on the CentOS 7 official image, while the database image is based on the official Alpine 3.6 image.
 
 ## A bit of history
 
@@ -40,7 +38,7 @@ The 'mysqld' process is killed with SIGTERM (so is gracefuly terminated) whateve
 
 ### Central image
 
-The Centreon application itself is written in PHP and Perl. As a downside for integration, it depends on PHP < 5.5 (NB: strictly inferior).
+I’m aware of the availability of Centreon packaged in RPM. While this is (very) easy to deploy a standalone, and quite outdated, Centreon solution, it’s not well suited to deploy a multi-host supervision. Beside, being able to follow the developpement of the product and mastering its deployement (what is made possible installing from the source), seems to be a useful advantage to make things done.
 
 Running Centreon with separated PHP and Web servers, seems a bit out of hand, at least for me. To simplify the problem I will try to have one container with all the necessary things. This image will, at first, be a Centreon poller too.
 
@@ -48,31 +46,30 @@ In the first place, I stick to Apache for the web server. Nginx may be another g
 
 Centreon, in contrast, is being built from source. I’m using the [sources available on GitHub](https://github.com/centreon/centreon), the branch of every component may be chosen using build arguments.
 
-I’m aware of the availability of Centreon packaged in RPM. While this is (very) easy to deploy a standalone, and quite outdated, Centreon solution, it’s not well suited to deploy a multi-host supervision. Beside, being able to follow the developpement of the product and mastering its deployement (what is made possible installing from the source), seems to be a useful advantage to make things done.
-
 The builds are made on the container itself (ie: there is no separate builder). I should probably change that in the futur but it’s not a priority for me (except if someone convince me of the contrary).
 
 The image is named `centreon`
 
 ### [Centreon CLib](https://github.com/centreon/centreon-clib)
 
-This is the base part of Centreon. No particular problem to build it. On CentOS as on Alpine.
+This is the base part of Centreon.
 
 #### [Centreon Broker](https://github.com/centreon/centreon-broker)
 
-Build on Alpine (so using Musl as standard library) with many warnings. OK on CentOS with the GNU libc (and definitively faster).
 
 #### [Centreon Engine](https://github.com/centreon/centreon-engine)
 
 The monitoring engine is independent (ie: may be used without Centreon).
-
-Using Alpine I discovered many compatibility problems in the source code. I tried to fix some, then I gave up. It’s OK on CentOS.
 
 ### [Centreon Connectors](https://github.com/centreon/centreon-connectors)
 
 Both SSH and Perl connectors are built but some configuration remains to do. Connectors aren’t use in out current setup but are a promising functionality.
 
 The SSH connector permits to maintain SSH connections between the poller and the supervised hosts, thus permiting to issue checks by SSH at a quite low cost.
+
+#### [Centreon](https://github.com/centreon/centreon)
+
+Most of the application is written in PHP (+ some parts in Perl). As a downside for integration, it depends on PHP < 5.5 (NB: strictly inferior)
 
 ## Docker volumes
 
@@ -107,23 +104,9 @@ The Centreon Web’s document root
 
 ## What’s left to do
 
-##### Centreon Connector Perl
-
-Persistent Perl interpreter that executes Perl plugins very fast.
-
-##### Centreon Connector SSH
-
-Maintain SSH connexions opened to reduce overhead of plugin execution over SSH
-
 #### Nagios plugins
 
 Legacy monitoring plugins are currently installed from the package available in the system.
-
-#### [Centreon](https://github.com/centreon/centreon)
-
-Most of the application is written in PHP. As a downside for integration, it depends on PHP < 5.5 (NB: strictly inferior)
-
-CentOS 7 is nice for this. We don’t have to install PHP from source as the distribution proposes PHP 5.4
 
 #### Centreon files and directories 
 
@@ -131,7 +114,7 @@ All binaries related to Centreon are in /centreon (it’s used as installation p
 
  - /centreon
  
-As it’s used for installation, it also contains the default configurations, but we will never use those files.
+As it’s used as installation prefix, it also contains the default configurations for each Centreon composants, but we will never use those files.
 
 Configuration, logs and variable data (metrics, status) are stored in the system default directories:
 
