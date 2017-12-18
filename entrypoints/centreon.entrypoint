@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 graceful_exit() {
     echo "Was asked to terminate myself…" >&2
