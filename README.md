@@ -16,19 +16,17 @@ One of the goals of this work is to learn Docker, and getting a better knowledge
 
 ## What is done so far
 
-A central image with CLib, Broker, Engine, Connectors and Centreon Web. The setup (install.sh) is done during image creation but the Centreon configuration itself must be realized once the container is running. Having `/etc` being a Docker volume the configuration will then persist across container restarts.
+A central image with CLib, Broker, Engine, Connectors and Centreon Web. The setup (install.sh) is done during image creation but the Centreon configuration itself must be realized once the container is running. Having '/etc' being a Docker volume the configuration will persist across container restarts.
 
-<aside class="notice">
-Once the setup has took place, you must manually rename the `/centreon/www/install` directory (as `/centreon/www/install.done` for example) to prevent the installation to restart again and again. This may be a bug, I don’t know.
-</aside>
+Once the setup has took place, you must manually rename the '/centreon/www/install' directory (as '/centreon/www/install.done' for example) to prevent the installation to restart again and again. This may be a bug, I don’t know.
 
 ### Database image
 
-It’s based on Alpine and it’s not as complete as the Debian based official MariaDB docker image. To run Centreon you may (and probably should) use the official image for your backend.
+It’s based on Alpine and it’s not as complete as the Debian based official MariaDB docker image. To run Centreon you may (and probably should) use the official image as your backend.
 
-MariaDB is installed from the packages available in Alpine 3.6. The image is named `centreondb`.
+MariaDB is installed from the packages available in Alpine 3.6. The image is named 'centreondb'.
 
-If `/var/lib/mysql/mysql` is not a directory then MariaDB is run once to:
+If '/var/lib/mysql/mysql' is not a directory then MariaDB is run once to:
 
  1) execute its initial configuration
  2) set the root password (from an env. variable)
@@ -36,16 +34,17 @@ If `/var/lib/mysql/mysql` is not a directory then MariaDB is run once to:
  
 Then (or if the server is already configured) MariaDB is run to listen to requests.
 
-The `mysqld` process is killed with SIGTERM (so is gracefuly terminated) whatever the container receive SIGINT, SIGTERM, SIGQUIT or SIGSTOP.
+The 'mysqld' process is killed with SIGTERM (so is gracefuly terminated) whatever the container receive SIGINT, SIGTERM, SIGQUIT or SIGSTOP.
+
+'/var/lib/mysql' is, of course, a Docker volume.
 
 ### Central image
 
-The Centreon application itself is written in PHP. As a downside for integration, it depends on PHP < 5.5 (NB: strictly inferior)
+The Centreon application itself is written in PHP and Perl. As a downside for integration, it depends on PHP < 5.5 (NB: strictly inferior).
 
 Running Centreon with separated PHP and Web servers, seems a bit out of hand, at least for me. To simplify the problem I will try to have one container with all the necessary things. This image will, at first, be a Centreon poller too.
 
 In the first place, I stick to Apache for the web server. Nginx may be another good choice to consider. I find it quite simpler to configure and operate, but being unaware of how Centreon is dependent of Apache I stay with the latter. 
-
 
 Centreon, in contrast, is being built from source. I’m using the [sources available on GitHub](https://github.com/centreon/centreon), the branch of every component may be chosen using build arguments.
 
@@ -57,25 +56,23 @@ The image is named `centreon`
 
 ### [Centreon CLib](https://github.com/centreon/centreon-clib)
 
-
 This is the base part of Centreon. No particular problem to build it. On CentOS as on Alpine.
 
 #### [Centreon Broker](https://github.com/centreon/centreon-broker)
 
 Build on Alpine (so using Musl as standard library) with many warnings. OK on CentOS with the GNU libc (and definitively faster).
 
-
 #### [Centreon Engine](https://github.com/centreon/centreon-engine)
-
 
 The monitoring engine is independent (ie: may be used without Centreon).
 
-Using Alpine I discovered many compatibility problems in the source code. I tried to fix some, then I gave up. OK on CentOS.
+Using Alpine I discovered many compatibility problems in the source code. I tried to fix some, then I gave up. It’s OK on CentOS.
 
 ### [Centreon Connectors](https://github.com/centreon/centreon-connectors)
 
-[Can’t build](https://github.com/centreon/centreon-connectors/issues/6)
+Both SSH and Perl connectors are built but some configuration remains to do. Connectors aren’t use in out current setup but are a promising functionality.
 
+The SSH connector permits to maintain SSH connections between the poller and the supervised hosts, thus permiting to issue checks by SSH at a quite low cost.
 
 ## Docker volumes
 

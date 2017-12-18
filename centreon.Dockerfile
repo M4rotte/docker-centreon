@@ -84,7 +84,8 @@ RUN cd /usr/local/src && mkdir /centreon/plugins &&\
     chown -R centreon-engine:centreon /usr/lib64/nagios/plugins &&\
     chmod -R g+rx /centreon/plugins /usr/lib64/nagios/plugins &&\
     chown root:root /usr/lib64/nagios/plugins/check_icmp &&\
-    chmod ug+s /usr/lib64/nagios/plugins/check_icmp
+    chmod ug+s /usr/lib64/nagios/plugins/check_icmp &&\
+    chmod o+rx /usr/lib64/nagios/plugins/check_icmp
 
 ## Default basic Apache configuration
 RUN sed -i -e 's/#ServerName www\.example\.com:80/ServerName '"${SERVER_HOSTNAME}"':80/' /etc/httpd/conf/httpd.conf &&\
