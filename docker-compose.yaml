@@ -14,7 +14,7 @@ services:
   centreondb:
     env_file: centreondb.env
     build:
-      context: .
+      context: centreondb
       dockerfile: centreondb.Dockerfile
       args:
         http_proxy: ${http_proxy}
@@ -33,7 +33,7 @@ services:
   centreon:
     env_file: centreon.env
     build:
-      context: .
+      context: centreon
       dockerfile: centreon.Dockerfile
       args:
        http_proxy: ${http_proxy}

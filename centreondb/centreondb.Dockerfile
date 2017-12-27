@@ -23,7 +23,7 @@ RUN rm -rf /var/cache/apk/* /tmp/* \
            -e "s/{build_host}/$(uname -rs)/" /etc/motd
 
 # Entrypoint
-COPY entrypoints/centreondb.entrypoint /entrypoint
+COPY centreondb.entrypoint /entrypoint
 
 # Files and perms
 RUN chmod go-rwx /entrypoint

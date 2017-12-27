@@ -135,7 +135,7 @@ RUN rm -rf /var/cache/yum/* \
            -e "s/{build_host}/$(uname -rs)/" /etc/motd
 
 # Entrypoint
-COPY entrypoints/centreon.entrypoint /entrypoint
+COPY centreon.entrypoint /entrypoint
 
 ## Files & perms
 RUN chmod go-rwx /entrypoint
