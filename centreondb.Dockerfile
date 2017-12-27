@@ -4,7 +4,7 @@ LABEL com.oxyure.vendor="United Microbiotas" \
       description="MariaDB 10.1.26"
 
 ## Repositories & packages ##
-RUN apk update && apk add bind-tools bash &&\
+RUN apk update && apk add bind-tools &&\
     apk add mariadb=10.1.26-r0 mariadb-client=10.1.26-r0
 
 # Set Europe/Paris for timezone.
