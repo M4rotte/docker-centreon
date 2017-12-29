@@ -12,7 +12,7 @@ networks:
 
 services:
   centreondb:
-    env_file: centreondb.env
+    env_file: centreondb/centreondb.env
     build:
       context: centreondb
       dockerfile: centreondb.Dockerfile
@@ -31,7 +31,7 @@ services:
      - centreondb-var-lib-mysql:/var/lib/mysql
 
   centreon:
-    env_file: centreon.env
+    env_file: centreon/centreon.env
     build:
       context: centreon
       dockerfile: centreon.Dockerfile

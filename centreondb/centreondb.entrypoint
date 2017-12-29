@@ -62,5 +62,8 @@ echo -e " MariaDB is running.\n"
 
 sleep 2 && ps -ef |tail -n +2
 
+# Container will stop if the mysqld process terminates.
+# If the mysqld process may be restarted during normal operations,
+# the `wait` command must be replaced by an infinite loop, typically : tail -f /dev/null
 wait
 

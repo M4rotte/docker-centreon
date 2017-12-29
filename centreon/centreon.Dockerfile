@@ -21,7 +21,7 @@ COPY files/etc/yum.repos.d /etc
 RUN echo -e "[main]\nenabled=0" > /etc/yum/pluginconf.d/fastestmirror.conf &&\
     yum -y install epel-release &&\
     yum -y update &&\
-    yum -y install binutils git make cmake glibc-devel rrdtool-devel qt-devel gnutls-devel perl-ExtUtils-Embed \
+    yum -y install binutils git make cmake glibc-devel rrdtool-devel qt-devel gnutls-devel perl-ExtUtils-Embed nrpe net-tools \
                    httpd gd fontconfig-devel libjpeg-devel libpng-devel gd-devel perl-GD perl-DateTime perl-Sys-Syslog \
                    openssl-devel perl-DBD-MySQL php php-mysql php-gd php-ldap php-xml php-mbstring \
                    perl-Config-IniFiles perl-DBI perl-JSON-XS perl-DBD-MySQL perl-rrdtool perl-Crypt-DES perl-Digest-SHA1 \
@@ -37,7 +37,7 @@ RUN mkdir /centreon &&\
     adduser -d /centreon -s /bin/bash -r centreon-engine &&\
     adduser -d /centreon -s /bin/bash -r centreon-broker &&\
     adduser -d /centreon -s /bin/bash -r centreon &&\
-    chown centreon:centreon /centreon &&\
+    chown -R centreon:centreon /centreon &&\
     usermod -a -G centreon apache &&\
     usermod -a -G centreon centreon-engine &&\
     usermod -a -G centreon centreon-broker &&\
@@ -109,12 +109,19 @@ COPY files/etc/centreon-engine/* /etc/centreon-engine/
 COPY files/etc/init.d/centengine /etc/init.d/centengine
 
 ## More configuration ##
+## Files’s owner/group are explicitly set again because the Centreon install script may have screw them…
 RUN echo '/centreon/lib' >> /etc/ld.so.conf && ldconfig &&\
+    usermod -a -G centreon nrpe &&\
+    usermod -a -G centreon nagios &&\
     cp -a /centreon/examples/centreon.sudo /etc/sudoers.d/centreon && chmod 0440 /etc/sudoers.d/centreon &&\
     chown -R centreon-engine:centreon /etc/centreon-engine && chmod -R g+rw /etc/centreon-engine &&\
     chown -R centreon-broker:centreon /etc/centreon-broker && chmod -R g+rw /etc/centreon-broker &&\
-    chown -R centreon:centreon /etc/centreon && chmod -R g+rw /etc/centreon-broker &&\
-    chown -R centreon:centreon /centreon && chmod -R g+rx /centreon && chmod -R g+w /centreon/www
+    chown -R centreon:centreon /etc/centreon && chmod -R g+rw /etc/centreon &&\
+    chown -R centreon:centreon /centreon && chmod -R g+rx /centreon && chmod -R g+w /centreon/www &&\
+    chown -R centreon-engine:centreon /var/lib/centreon-engine && chmod -R g+rx /var/lib/centreon-engine && chmod -R g+w /var/lib/centreon-engine &&\
+    chown -R centreon-broker:centreon /var/lib/centreon-broker && chmod -R g+rx /var/lib/centreon-broker && chmod -R g+w /var/lib/centreon-broker &&\
+    chown -R centreon-engine:centreon /var/log/centreon-engine && chmod -R g+rx /var/log/centreon-engine && chmod -R g+w /var/log/centreon-engine &&\
+    chown -R centreon-broker:centreon /var/log/centreon-broker && chmod -R g+rx /var/log/centreon-broker && chmod -R g+w /var/log/centreon-broker    
 
 # Set Europe/Paris for timezone.
 RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime &&\
