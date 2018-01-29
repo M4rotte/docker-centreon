@@ -10,6 +10,7 @@ graceful_exit() {
     #~ /etc/init.d/centcore stop
     kill -15 $CENTREON_CORE_PID
     echo "Centreon has been stopped." >&2
+    kill -15 $DUMMY_CHILD_PID
     exit 0
 }
 
@@ -60,20 +61,24 @@ echo -e " * Starting Centreon Engine… \n"
 echo -e " * Starting Apache… \n"
 /usr/sbin/httpd
 
-
 echo centcore   PID: $CENTREON_CORE_PID
 echo cbd-broker PID: $CENTREON_BROKER_PID
 echo cbd-rrd    PID: $CENTREON_BROKER_RRD_PID
 echo snmpd      PID: $SNMPD_PID
 
-
 sleep 2 && ps -Hef |tail -n +2
-
 
 # Container will stop if all the three background tasks terminate.
 # If centcore, snmpd and/or cbd (broker daemons) may be restarted during normal operations,
 # the `wait` command must be replaced by an infinite loop, typically : tail -f /dev/null
-wait
+#~ wait
+
+# Some test…
+tail -f /dev/null &
+DUMMY_CHILD_PID=$!
+while [ ps -p $DUMMY_CHILD_PID ]; do
+    sleep 1
+done
 
 
 
