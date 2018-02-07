@@ -50,7 +50,6 @@ export CENTREON_DB_PASSWD=''
 # Also trap SIGINT, SIGQUIT and SIGSTOP
 mariadb_stop() { echo " * MariaDB is shutting down…"
                  kill -15 $(cat "$PID_FILE")
-                 kill -15 $
                  exit 0; }
 trap mariadb_stop 2 3 15 19
 
@@ -67,16 +66,7 @@ sleep 2 && ps -ef |tail -n +2
 
 env
 
-# Container will stop if the mysqld process terminates.
-# If the mysqld process may be restarted during normal operations,
-# the `wait` command must be replaced by an infinite loop, typically : tail -f /dev/null
-wait
+tail -f /dev/null
 
-#~ # Some test…
-#~ tail -f /dev/null &
-#~ DUMMY_CHILD_PID=$!
-#~ while [ $(kill -0 $DUMMY_CHILD_PID) ]; do
-    #~ sleep 1
-#~ done
 
 

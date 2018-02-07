@@ -71,6 +71,8 @@ The SSH connector permits to maintain SSH connections between the poller and the
 
 Most of the application is written in PHP (+ some parts in Perl). As a downside for integration, it depends on PHP < 5.5 (NB: strictly inferior)
 
+The initial Centreon upgrade (install/upgrade.php) which takes place the first time keeps restarting again for an unknown reason. So after it took place, you need to manually connect to the container and `mv /centreon/www/install /centreon/www/install.done`
+
 ## Docker volumes
 
 ### centreondb
