@@ -1,6 +1,6 @@
 # Centreon Docker images
 
-This is a "work in progress" project. The v0.1 offer a minimal working setup, with one central/poller image and one database image.
+This is a "work in progress" project. The v0.3 offer a minimal working setup, with one central/poller image and one database image.
 
 The Centreon central image is based on the CentOS 7 official image, while the database image is based on the official Alpine 3.6 image.
 
