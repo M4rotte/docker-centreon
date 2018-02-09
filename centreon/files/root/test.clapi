@@ -1,0 +1,185 @@
+CMD;ADD;Ping;2;$USER1$/check_ping -H $HOSTADDRESS$ -w $ARG1$ -c $ARG2$
+CMD;setparam;Ping;enable_shell;0
+CMD;setparam;Ping;command_activate;1
+CMD;setparam;Ping;command_locked;0
+CMD;ADD;HTTP;2;$USER1$/check_http -H $HOSTADDRESS$ -f follow
+CMD;setparam;HTTP;enable_shell;0
+CMD;setparam;HTTP;command_activate;1
+CMD;setparam;HTTP;command_locked;0
+CMD;ADD;MariaDB;2;$USER1$/check_mysql -H $HOSTADDRESS$ -n
+CMD;setparam;MariaDB;enable_shell;0
+CMD;setparam;MariaDB;command_activate;1
+CMD;setparam;MariaDB;command_locked;0
+CMD;ADD;CPU_Load_average;2;$USER1$/check_nrpe -H $HOSTADDRESS$ -c check_load
+CMD;setparam;CPU_Load_average;enable_shell;0
+CMD;setparam;CPU_Load_average;command_activate;1
+CMD;setparam;CPU_Load_average;command_locked;0
+CMD;ADD;Used_disk_space;2;$USER1$/check_nt -H $HOSTADDRESS$ -v USEDDISKSPACE -l $_SERVICEDISK$ -w $ARG1$ -c $ARG2$ -p 12489 -d SHOWALL -s None
+CMD;setparam;Used_disk_space;enable_shell;0
+CMD;setparam;Used_disk_space;command_activate;1
+CMD;setparam;Used_disk_space;command_locked;0
+HTPL;ADD;Generic;Generic host;;;;
+HTPL;setparam;Generic;check_command;Ping
+HTPL;setparam;Generic;check_command_arguments;!100,1%!1000,10%!
+HTPL;setparam;Generic;check_period;24x7
+HTPL;setparam;Generic;host_max_check_attempts;3
+HTPL;setparam;Generic;host_check_interval;5
+HTPL;setparam;Generic;host_retry_check_interval;1
+HTPL;setparam;Generic;host_active_checks_enabled;1
+HTPL;setparam;Generic;host_passive_checks_enabled;1
+HTPL;setparam;Generic;host_checks_enabled;2
+HTPL;setparam;Generic;host_obsess_over_host;2
+HTPL;setparam;Generic;host_check_freshness;2
+HTPL;setparam;Generic;host_event_handler_enabled;2
+HTPL;setparam;Generic;host_flap_detection_enabled;2
+HTPL;setparam;Generic;host_retain_status_information;1
+HTPL;setparam;Generic;host_retain_nonstatus_information;1
+HTPL;setparam;Generic;host_notifications_enabled;2
+HTPL;setparam;Generic;contact_additive_inheritance;0
+HTPL;setparam;Generic;cg_additive_inheritance;0
+HTPL;setparam;Generic;host_locked;0
+HTPL;setparam;Generic;host_register;0
+HTPL;setparam;Generic;host_activate;1
+HOST;ADD;centreon;Centreon central server;172.36.0.100;;Central;
+HOST;setparam;centreon;host_active_checks_enabled;2
+HOST;setparam;centreon;host_passive_checks_enabled;2
+HOST;setparam;centreon;host_checks_enabled;2
+HOST;setparam;centreon;host_obsess_over_host;2
+HOST;setparam;centreon;host_check_freshness;2
+HOST;setparam;centreon;host_event_handler_enabled;2
+HOST;setparam;centreon;host_flap_detection_enabled;2
+HOST;setparam;centreon;host_retain_status_information;2
+HOST;setparam;centreon;host_retain_nonstatus_information;2
+HOST;setparam;centreon;host_notifications_enabled;2
+HOST;setparam;centreon;contact_additive_inheritance;0
+HOST;setparam;centreon;cg_additive_inheritance;0
+HOST;setparam;centreon;host_locked;0
+HOST;setparam;centreon;host_register;1
+HOST;setparam;centreon;host_activate;1
+HOST;ADD;centreondb;Centreon database server;172.36.0.42;;Central;
+HOST;setparam;centreondb;host_active_checks_enabled;2
+HOST;setparam;centreondb;host_passive_checks_enabled;2
+HOST;setparam;centreondb;host_checks_enabled;2
+HOST;setparam;centreondb;host_obsess_over_host;2
+HOST;setparam;centreondb;host_check_freshness;2
+HOST;setparam;centreondb;host_event_handler_enabled;2
+HOST;setparam;centreondb;host_flap_detection_enabled;2
+HOST;setparam;centreondb;host_retain_status_information;2
+HOST;setparam;centreondb;host_retain_nonstatus_information;2
+HOST;setparam;centreondb;host_notifications_enabled;2
+HOST;setparam;centreondb;contact_additive_inheritance;0
+HOST;setparam;centreondb;cg_additive_inheritance;0
+HOST;setparam;centreondb;host_locked;0
+HOST;setparam;centreondb;host_register;1
+HOST;setparam;centreondb;host_activate;1
+HOST;addtemplate;centreon;Generic
+HOST;addtemplate;centreondb;Generic
+STPL;ADD;Generic;Generic service;
+STPL;setparam;Generic;check_period;24x7
+STPL;setparam;Generic;notification_period;24x7
+STPL;setparam;Generic;service_is_volatile;2
+STPL;setparam;Generic;service_max_check_attempts;3
+STPL;setparam;Generic;service_normal_check_interval;5
+STPL;setparam;Generic;service_retry_check_interval;1
+STPL;setparam;Generic;service_active_checks_enabled;1
+STPL;setparam;Generic;service_passive_checks_enabled;1
+STPL;setparam;Generic;service_parallelize_check;2
+STPL;setparam;Generic;service_obsess_over_service;2
+STPL;setparam;Generic;service_check_freshness;2
+STPL;setparam;Generic;service_event_handler_enabled;2
+STPL;setparam;Generic;service_flap_detection_enabled;2
+STPL;setparam;Generic;service_process_perf_data;2
+STPL;setparam;Generic;service_retain_status_information;1
+STPL;setparam;Generic;service_retain_nonstatus_information;1
+STPL;setparam;Generic;service_notification_options;n
+STPL;setparam;Generic;service_notifications_enabled;2
+STPL;setparam;Generic;contact_additive_inheritance;0
+STPL;setparam;Generic;cg_additive_inheritance;0
+STPL;setparam;Generic;service_inherit_contacts_from_host;1
+STPL;setparam;Generic;service_locked;0
+STPL;setparam;Generic;service_register;0
+STPL;setparam;Generic;service_activate;1
+SERVICE;ADD;centreon;HTTP;Generic
+SERVICE;setparam;centreon;HTTP;check_command;HTTP
+SERVICE;setparam;centreon;HTTP;service_is_volatile;2
+SERVICE;setparam;centreon;HTTP;service_active_checks_enabled;2
+SERVICE;setparam;centreon;HTTP;service_passive_checks_enabled;2
+SERVICE;setparam;centreon;HTTP;service_parallelize_check;2
+SERVICE;setparam;centreon;HTTP;service_obsess_over_service;2
+SERVICE;setparam;centreon;HTTP;service_check_freshness;2
+SERVICE;setparam;centreon;HTTP;service_event_handler_enabled;2
+SERVICE;setparam;centreon;HTTP;service_flap_detection_enabled;2
+SERVICE;setparam;centreon;HTTP;service_process_perf_data;2
+SERVICE;setparam;centreon;HTTP;service_retain_status_information;2
+SERVICE;setparam;centreon;HTTP;service_retain_nonstatus_information;2
+SERVICE;setparam;centreon;HTTP;service_notifications_enabled;2
+SERVICE;setparam;centreon;HTTP;contact_additive_inheritance;0
+SERVICE;setparam;centreon;HTTP;cg_additive_inheritance;0
+SERVICE;setparam;centreon;HTTP;service_inherit_contacts_from_host;1
+SERVICE;setparam;centreon;HTTP;service_use_only_contacts_from_host;0
+SERVICE;setparam;centreon;HTTP;service_locked;0
+SERVICE;setparam;centreon;HTTP;service_register;1
+SERVICE;setparam;centreon;HTTP;service_activate;1
+SERVICE;ADD;centreondb;MariaDB;Generic
+SERVICE;setparam;centreondb;MariaDB;check_command;MariaDB
+SERVICE;setparam;centreondb;MariaDB;service_is_volatile;2
+SERVICE;setparam;centreondb;MariaDB;service_active_checks_enabled;2
+SERVICE;setparam;centreondb;MariaDB;service_passive_checks_enabled;2
+SERVICE;setparam;centreondb;MariaDB;service_parallelize_check;2
+SERVICE;setparam;centreondb;MariaDB;service_obsess_over_service;2
+SERVICE;setparam;centreondb;MariaDB;service_check_freshness;2
+SERVICE;setparam;centreondb;MariaDB;service_event_handler_enabled;2
+SERVICE;setparam;centreondb;MariaDB;service_flap_detection_enabled;2
+SERVICE;setparam;centreondb;MariaDB;service_process_perf_data;2
+SERVICE;setparam;centreondb;MariaDB;service_retain_status_information;2
+SERVICE;setparam;centreondb;MariaDB;service_retain_nonstatus_information;2
+SERVICE;setparam;centreondb;MariaDB;service_notifications_enabled;2
+SERVICE;setparam;centreondb;MariaDB;contact_additive_inheritance;0
+SERVICE;setparam;centreondb;MariaDB;cg_additive_inheritance;0
+SERVICE;setparam;centreondb;MariaDB;service_inherit_contacts_from_host;1
+SERVICE;setparam;centreondb;MariaDB;service_use_only_contacts_from_host;0
+SERVICE;setparam;centreondb;MariaDB;service_locked;0
+SERVICE;setparam;centreondb;MariaDB;service_register;1
+SERVICE;setparam;centreondb;MariaDB;service_activate;1
+SERVICE;ADD;centreon;CPU Load average;Generic
+SERVICE;setparam;centreon;CPU Load average;check_command;CPU_Load_average
+SERVICE;setparam;centreon;CPU Load average;service_is_volatile;2
+SERVICE;setparam;centreon;CPU Load average;service_active_checks_enabled;2
+SERVICE;setparam;centreon;CPU Load average;service_passive_checks_enabled;2
+SERVICE;setparam;centreon;CPU Load average;service_parallelize_check;2
+SERVICE;setparam;centreon;CPU Load average;service_obsess_over_service;2
+SERVICE;setparam;centreon;CPU Load average;service_check_freshness;2
+SERVICE;setparam;centreon;CPU Load average;service_event_handler_enabled;2
+SERVICE;setparam;centreon;CPU Load average;service_flap_detection_enabled;2
+SERVICE;setparam;centreon;CPU Load average;service_process_perf_data;2
+SERVICE;setparam;centreon;CPU Load average;service_retain_status_information;1
+SERVICE;setparam;centreon;CPU Load average;service_retain_nonstatus_information;1
+SERVICE;setparam;centreon;CPU Load average;service_notifications_enabled;2
+SERVICE;setparam;centreon;CPU Load average;contact_additive_inheritance;0
+SERVICE;setparam;centreon;CPU Load average;cg_additive_inheritance;0
+SERVICE;setparam;centreon;CPU Load average;service_inherit_contacts_from_host;1
+SERVICE;setparam;centreon;CPU Load average;service_use_only_contacts_from_host;0
+SERVICE;setparam;centreon;CPU Load average;service_locked;0
+SERVICE;setparam;centreon;CPU Load average;service_register;1
+SERVICE;setparam;centreon;CPU Load average;service_activate;1
+SERVICE;ADD;centreondb;CPU Load average;Generic
+SERVICE;setparam;centreondb;CPU Load average;check_command;CPU_Load_average
+SERVICE;setparam;centreondb;CPU Load average;service_is_volatile;2
+SERVICE;setparam;centreondb;CPU Load average;service_active_checks_enabled;2
+SERVICE;setparam;centreondb;CPU Load average;service_passive_checks_enabled;2
+SERVICE;setparam;centreondb;CPU Load average;service_parallelize_check;2
+SERVICE;setparam;centreondb;CPU Load average;service_obsess_over_service;2
+SERVICE;setparam;centreondb;CPU Load average;service_check_freshness;2
+SERVICE;setparam;centreondb;CPU Load average;service_event_handler_enabled;2
+SERVICE;setparam;centreondb;CPU Load average;service_flap_detection_enabled;2
+SERVICE;setparam;centreondb;CPU Load average;service_process_perf_data;2
+SERVICE;setparam;centreondb;CPU Load average;service_retain_status_information;1
+SERVICE;setparam;centreondb;CPU Load average;service_retain_nonstatus_information;1
+SERVICE;setparam;centreondb;CPU Load average;service_notifications_enabled;2
+SERVICE;setparam;centreondb;CPU Load average;contact_additive_inheritance;0
+SERVICE;setparam;centreondb;CPU Load average;cg_additive_inheritance;0
+SERVICE;setparam;centreondb;CPU Load average;service_inherit_contacts_from_host;1
+SERVICE;setparam;centreondb;CPU Load average;service_use_only_contacts_from_host;0
+SERVICE;setparam;centreondb;CPU Load average;service_locked;0
+SERVICE;setparam;centreondb;CPU Load average;service_register;1
+SERVICE;setparam;centreondb;CPU Load average;service_activate;1

@@ -50,7 +50,9 @@ export CENTREON_DB_PASSWD=''
 # Also trap SIGINT, SIGQUIT and SIGSTOP
 mariadb_stop() { echo " * MariaDB is shutting down…"
                  kill -15 $(cat "$PID_FILE")
+                 kill -15 $DUMMY_PROCESS_PID
                  exit 0; }
+
 trap mariadb_stop 2 3 15 19
 
 mysqld_safe --pid-file="$PID_FILE" --datadir="$DATADIR" --log-error="mariadb.err" --user=mysql &
@@ -61,6 +63,10 @@ while [ -z "$(pidof 'mysqld')" ]; do
 done
 
 echo -e " MariaDB is running.\n"
+
+# Start a dummy process which never terminates, to prevent the entrypoint to terminate itself if all its children have restarted…
+tail -f /dev/null &
+DUMMY_PROCESS_PID=$!
 
 sleep 2 && ps -ef |tail -n +2
 

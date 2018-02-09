@@ -87,6 +87,12 @@ RUN cd /usr/local/src && mkdir /centreon/plugins &&\
     chmod ug+s /usr/lib64/nagios/plugins/check_icmp &&\
     chmod o+rx /usr/lib64/nagios/plugins/check_icmp
 
+## Centreon : Install widgets ##
+RUN cd /usr/local/src && git clone https://github.com/centreon/centreon-widget-global-health.git &&\
+    cd centreon-widget-global-health &&\
+    mkdir -p /centreon/www/widgets &&\
+    cp -a global-health /centreon/www/widgets/
+
 ## Default basic Apache configuration
 RUN sed -i -e 's/#ServerName www\.example\.com:80/ServerName '"${SERVER_HOSTNAME}"':80/' /etc/httpd/conf/httpd.conf &&\
     chown -R apache:apache /var/www &&\
@@ -94,11 +100,14 @@ RUN sed -i -e 's/#ServerName www\.example\.com:80/ServerName '"${SERVER_HOSTNAME
     chmod -R o-rwx /var/www
 ## END Apache configuration
 
+## Configure NRPE server
+RUN sed -i -e 's/allowed_hosts=127.0.0.1/allowed_hosts=127.0.0.1,centreon/' /etc/nagios/nrpe.cfg
+
 ## Configure Centreon ##
 ## Most of the configuration is done by the Centreon setup script.
 ## We also set a working configuration for engine, broker and centcore.
 ## So the processes can start even if Centreon is not yet configured.
-COPY files/root/centreon-template /root
+COPY files/root/* /root
 RUN touch /etc/sudoers.d/centreon &&\
     cd /usr/local/src/centreon &&\
     ./install.sh -v -i -f /root/centreon-template
@@ -114,14 +123,17 @@ RUN echo '/centreon/lib' >> /etc/ld.so.conf && ldconfig &&\
     usermod -a -G centreon nrpe &&\
     usermod -a -G centreon nagios &&\
     cp -a /centreon/examples/centreon.sudo /etc/sudoers.d/centreon && chmod 0440 /etc/sudoers.d/centreon &&\
+    mkdir -p /var/lib/centreon/nagios-perf/ /var/cache/centreon/backup &&\
     chown -R centreon-engine:centreon /etc/centreon-engine && chmod -R g+rw /etc/centreon-engine &&\
     chown -R centreon-broker:centreon /etc/centreon-broker && chmod -R g+rw /etc/centreon-broker &&\
     chown -R centreon:centreon /etc/centreon && chmod -R g+rw /etc/centreon &&\
     chown -R centreon:centreon /centreon && chmod -R g+rx /centreon && chmod -R g+w /centreon/www &&\
+    chown -R centreon:centreon /var/cache/centreon && chmod -R g+rwx /var/cache/centreon &&\
     chown -R centreon-engine:centreon /var/lib/centreon-engine && chmod -R g+rx /var/lib/centreon-engine && chmod -R g+w /var/lib/centreon-engine &&\
     chown -R centreon-broker:centreon /var/lib/centreon-broker && chmod -R g+rx /var/lib/centreon-broker && chmod -R g+w /var/lib/centreon-broker &&\
     chown -R centreon-engine:centreon /var/log/centreon-engine && chmod -R g+rx /var/log/centreon-engine && chmod -R g+w /var/log/centreon-engine &&\
-    chown -R centreon-broker:centreon /var/log/centreon-broker && chmod -R g+rx /var/log/centreon-broker && chmod -R g+w /var/log/centreon-broker    
+    chown -R centreon-broker:centreon /var/log/centreon-broker && chmod -R g+rx /var/log/centreon-broker && chmod -R g+w /var/log/centreon-broker &&\
+    chmod g+w /var/lib/centreon/*
 
 # Set Europe/Paris for timezone.
 RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime &&\
@@ -132,12 +144,12 @@ RUN yum -y --noplugins erase git cmake gcc gcc-c++ glibc-devel rrdtool-devel qt-
                        glib2-devel glibc-devel glibc-static fontconfig-devel libjpeg-devel libpng-devel gd-devel &&\
     yum --noplugins clean all
 
-## Remove some files ##
-## Add some information in the MOTD file ##
+
+## Add some information in the MOTD file and remove some files ##
 COPY files/etc/motd-centreon /etc/motd
 RUN rm -rf /var/cache/yum/* \
            /etc/modprobe.d /etc/modules-load.d /etc/modules \
-           /etc/udhcpd.conf /etc/securetty &&\
+           /etc/udhcpd.conf /etc/securetty /usr/local/src/* &&\
     sed -i -e "s/{build_date}/$(date)/" \
            -e "s/{build_host}/$(uname -rs)/" /etc/motd
 

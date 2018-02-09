@@ -5,7 +5,8 @@ LABEL com.oxyure.vendor="United Microbiotas" \
 
 ## Repositories & packages ##
 RUN apk update && apk add bind-tools &&\
-    apk add mariadb=10.1.26-r0 mariadb-client=10.1.26-r0
+    apk add mariadb=10.1.26-r0 mariadb-client=10.1.26-r0 \
+            nrpe nagios-plugins-load
 
 # Set Europe/Paris for timezone.
 RUN apk add --no-cache tzdata &&\
@@ -13,6 +14,8 @@ RUN apk add --no-cache tzdata &&\
     echo "Europe/Paris" > /etc/timezone &&\
     apk del --purge tzdata
 
+## Configure NRPE server
+RUN sed -i -e 's/allowed_hosts=127.0.0.1/allowed_hosts=127.0.0.1,centreon/' /etc/nrpe.cfg
 
 ## Remove some files ##
 ## Add some information in the MOTD file ##
