@@ -64,9 +64,7 @@ echo -e " MariaDB is running.\n"
 
 sleep 2 && ps -ef |tail -n +2
 
-env
-
-tail -f /dev/null
+wait
 
 
 

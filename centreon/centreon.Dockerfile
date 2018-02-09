@@ -27,7 +27,7 @@ RUN echo -e "[main]\nenabled=0" > /etc/yum/pluginconf.d/fastestmirror.conf &&\
                        perl-Config-IniFiles perl-DBI perl-JSON-XS perl-DBD-MySQL perl-rrdtool perl-Crypt-DES perl-Digest-SHA1 \
                        perl-Digest-HMAC net-snmp-utils perl-Socket6 perl-IO-Socket-INET6 net-snmp net-snmp-libs php-snmp \
                        dmidecode perl-Net-SNMP net-snmp-perl fping cpp gcc gcc-c++ libstdc++ glib2-devel glibc-static \
-                       php-pear nagios-plugins-all redhat-lsb-core sendmail mailx sudo perl net-snmp-perl perl-XML-LibXML \
+                       php-pear nagios-plugins-all nagios-plugins-nrpe redhat-lsb-core sendmail mailx sudo perl net-snmp-perl perl-XML-LibXML \
                        perl-JSON perl-libwww-perl perl-XML-XPath perl-Net-Telnet perl-Net-DNS perl-DBI perl-DBD-MySQL perl-DBD-Pg \
                        perl-File-Find-Object perl-Pod-Parser which openssh-clients php-pear-DB php-pear-DB-DataObject \
                        qt-mysql tzdata libssh2-devel libgcrypt-devel php-intl perl-libintl

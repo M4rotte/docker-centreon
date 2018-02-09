@@ -27,6 +27,7 @@ CENTREON        : $(/centreon/bin/centreon -V |grep -Ev '^$' |head -1)
 CENTREON ENGINE : $(/centreon/bin/centengine -V |awk '{if (NR<2) {print $3,$4,$5}}')
 CENTREON BROKER : $(/centreon/bin/cbd -v |awk '{print $3,$4,$5}')
 SNMP DAEMON     : $(/usr/sbin/snmpd -v |awk '/^NET-SNMP version.*/ {print $3}')
+NRPE DAEMON     : $(/usr/sbin/nrpe -V |awk '{if (NR>1) print $2}')
 ########################################
 EOF
 
@@ -60,14 +61,24 @@ echo -e " * Starting Centreon Engine… \n"
 echo -e " * Starting Apache… \n"
 /usr/sbin/httpd
 
+#~ echo -e " * Starting NRPE… \n"
+#~ su -s /bin/bash -c "/usr/sbin/nrpe -c /etc/nagios/nrpe.cfg -f" nrpe &
+#~ NRPE_PID=$!
+
+echo -e " * Starting NRPE… \n"
+/usr/sbin/nrpe -c /etc/nagios/nrpe.cfg -d &
+NRPE_PID=$!
+
 echo centcore   PID: $CENTREON_CORE_PID
 echo cbd-broker PID: $CENTREON_BROKER_PID
 echo cbd-rrd    PID: $CENTREON_BROKER_RRD_PID
 echo snmpd      PID: $SNMPD_PID
+echo nrpe       PID: $NRPE_PID
 
 sleep 2 && ps -Hef |tail -n +2
 
-tail -f /dev/null
+wait
+
 
 
 
