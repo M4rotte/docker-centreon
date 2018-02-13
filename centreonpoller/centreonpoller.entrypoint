@@ -5,10 +5,7 @@ graceful_exit() {
     httpd -k stop
     kill -15 $(cat /var/run/snmpd.pid) && rm -f /var/run/snmpd.pid
     /etc/init.d/centengine stop
-    kill -15 $CENTREON_BROKER_RRD_PID && echo "Centreon RRD broker has been stopped."
-    kill -15 $CENTREON_BROKER_PID && echo "Centreon Main broker has been stopped."
     kill -15 $(cat /run/nrpe/nrpe.pid) && echo "NRPE server has been stopped."
-    kill -15 $CENTREON_CORE_PID && echo "Centreon has been stopped." >&2
     kill -15 $DUMMY_PROCESS_PID
     exit 0
 }
@@ -18,12 +15,10 @@ trap graceful_exit 2 3 15 19
 while [ -z "${IP_ADDR}" ]; do IP_ADDR="$(hostname -i)"; done
 
 cat <<EOF
-##########  Centreon central  ##########
+##########  Centreon poller   ##########
 ADDRESS         : $IP_ADDR
 HOSTNAME        : $HOSTNAME
 TIMEZONE        : $(cat /etc/timezone)
-PHP             : $(php -v |awk '{if (NR==1) {print $1,$2}}')
-CENTREON        : $(/centreon/bin/centreon -V |grep -Ev '^$' |head -1)
 CENTREON ENGINE : $(/centreon/bin/centengine -V |awk '{if (NR<2) {print $3,$4,$5}}')
 CENTREON BROKER : $(/centreon/bin/cbd -v |awk '{print $3,$4,$5}')
 SNMP DAEMON     : $(/usr/sbin/snmpd -v |awk '/^NET-SNMP version.*/ {print $3}')
@@ -34,31 +29,12 @@ EOF
 # Should this rather be done at build time?
 sed -i -e "s/\;date.timezone =/date.timezone = Europe\/Paris/" /etc/php.ini
 
-## Test file: TO BE REMOVED
-echo -e "<?php phpinfo(); ?>\n" > /var/www/php.php
-chmod -R u+rwx /var/www/php.php
-
 ## Starting SNMP daemon. This is optionnal.
 echo -e " * Starting SNMP Daemon… \n"
 /usr/sbin/snmpd -LS0-6d -Lf /dev/null -p /var/run/snmpd.pid &
 
-echo -e " * Starting Centreon Core… \n"
-#~ /etc/init.d/centcore start # The "stop" action is not working so we don’t use the init script to start neither.
-su -c "/usr/bin/perl /centreon/bin/centcore --logfile=/var/log/centreon/centcore.log --severity=debug --config=/etc/centreon/conf.pm" centreon &
-CENTREON_CORE_PID=$!
-
-echo -e " * Starting Centreon Broker… \n"
-su -c "/centreon/bin/cbd /etc/centreon-broker/central-broker.xml" centreon-broker &
-CENTREON_BROKER_PID=$!
-
-su -c "/centreon/bin/cbd /etc/centreon-broker/central-rrd.xml" centreon-broker &
-CENTREON_BROKER_RRD_PID=$!
-
 echo -e " * Starting Centreon Engine… \n"
 /etc/init.d/centengine start
-
-echo -e " * Starting Apache… \n"
-/usr/sbin/httpd
 
 echo -e " * Starting NRPE… \n"
 /usr/sbin/nrpe -c /etc/nagios/nrpe.cfg -d &

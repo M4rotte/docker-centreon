@@ -4,6 +4,7 @@ volumes:
   centreondb-var-lib-mysql:
   centreon-etc:
   centreon-centreon-www:
+  centreonpoller-etc:
 
 networks:
   centreon-net:
@@ -60,3 +61,28 @@ services:
      - centreon-etc:/etc
      - centreon-centreon-www:/centreon/www
 
+  centreonpoller:
+    env_file: centreonpoller/centreonpoller.env
+    build:
+      context: centreonpoller
+      dockerfile: centreonpoller.Dockerfile
+      args:
+       http_proxy: ${http_proxy}
+       https_proxy: ${https_proxy}
+       CENTREON_CLIB_VERSION: ${CENTREON_CLIB_VERSION}
+       CENTREON_ENGINE_VERSION: ${CENTREON_ENGINE_VERSION}
+       CENTREON_BROKER_VERSION: ${CENTREON_BROKER_VERSION}
+       CENTREON_CONNECTORS_VERSION: ${CENTREON_CONNECTORS_VERSION}
+       CENTREON_TIMEZONE: ${CENTREON_TIMEZONE}
+    depends_on:
+     - centreon
+    image: oxyure/centreonpoller:latest
+    entrypoint:
+     - /entrypoint
+    container_name: centreonpoller
+    hostname: centreonpoller
+    networks:
+      centreon-net:
+          ipv4_address: "172.36.0.200"
+    volumes:
+     - centreonpoller-etc:/etc

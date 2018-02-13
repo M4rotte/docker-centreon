@@ -1,6 +1,6 @@
 # Centreon Docker images
 
-This is a "work in progress" project. The v0.4 offers a minimal working setup, with one central/poller image and one database image.
+This is a "work in progress" project. The v0.5 offers a minimal working setup, with one central/poller image and one database image.
 
 The Centreon central image is based on the CentOS 7 official image, while the database image is based on the official Alpine 3.6 image.
 
@@ -69,7 +69,7 @@ The SSH connector permits to maintain SSH connections between the poller and the
 
 #### [Centreon](https://github.com/centreon/centreon)
 
-Most of the application is written in PHP (+ some parts in Perl). As a downside for integration, it depends on PHP < 5.5 (NB: strictly inferior)
+Most of the application is written in PHP (+ some parts in Perl). As a downside for integration, it depends on PHP < 5.5 (NB: strictly inferior), thus restricting the choice of distribution. Currently (02/2018), CentOS 7 seems to be the only, still maintained, distribution offering PHP 5.4…
 
 The initial Centreon upgrade (install/upgrade.php) which takes place the first time keeps restarting again for an unknown reason. So after it took place, you need to manually connect to the container and `mv /centreon/www/install /centreon/www/install.done`
 
