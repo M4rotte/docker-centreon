@@ -1,3 +1,5 @@
+RESOURCECFG;ADD;USER1;/usr/lib64/nagios/plugins;Central;Path to Nagios plugins
+RESOURCECFG;setparam;USER1;activate;1
 CMD;ADD;Ping;2;$USER1$/check_ping -H $HOSTADDRESS$ -w $ARG1$ -c $ARG2$
 CMD;setparam;Ping;enable_shell;0
 CMD;setparam;Ping;command_activate;1

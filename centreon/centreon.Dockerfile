@@ -101,13 +101,14 @@ RUN sed -i -e 's/#ServerName www\.example\.com:80/ServerName '"${SERVER_HOSTNAME
 ## END Apache configuration
 
 ## Configure NRPE server
-RUN sed -i -e 's/allowed_hosts=127.0.0.1/allowed_hosts=127.0.0.1,centreon/' /etc/nagios/nrpe.cfg
+RUN sed -i -e 's/allowed_hosts=127.0.0.1/allowed_hosts=127.0.0.1,centreon/' \
+           -e 's/\/check_load -r -w .15,.10,.05 -c .30,.25,.20/\/check_load -r -w 1,.75,.50 -c 2,1.50,1/' /etc/nagios/nrpe.cfg 
 
 ## Configure Centreon ##
 ## Most of the configuration is done by the Centreon setup script.
 ## We also set a working configuration for engine, broker and centcore.
 ## So the processes can start even if Centreon is not yet configured.
-COPY files/root/* /root
+COPY files/root/* /root/
 RUN touch /etc/sudoers.d/centreon &&\
     cd /usr/local/src/centreon &&\
     ./install.sh -v -i -f /root/centreon-template
@@ -127,13 +128,18 @@ RUN echo '/centreon/lib' >> /etc/ld.so.conf && ldconfig &&\
     chown -R centreon-engine:centreon /etc/centreon-engine && chmod -R g+rw /etc/centreon-engine &&\
     chown -R centreon-broker:centreon /etc/centreon-broker && chmod -R g+rw /etc/centreon-broker &&\
     chown -R centreon:centreon /etc/centreon && chmod -R g+rw /etc/centreon &&\
-    chown -R centreon:centreon /centreon && chmod -R g+rx /centreon && chmod -R g+w /centreon/www &&\
+    chown -R centreon:centreon /centreon && chmod -R g+rwx /centreon &&\
     chown -R centreon:centreon /var/cache/centreon && chmod -R g+rwx /var/cache/centreon &&\
     chown -R centreon-engine:centreon /var/lib/centreon-engine && chmod -R g+rx /var/lib/centreon-engine && chmod -R g+w /var/lib/centreon-engine &&\
     chown -R centreon-broker:centreon /var/lib/centreon-broker && chmod -R g+rx /var/lib/centreon-broker && chmod -R g+w /var/lib/centreon-broker &&\
     chown -R centreon-engine:centreon /var/log/centreon-engine && chmod -R g+rx /var/log/centreon-engine && chmod -R g+w /var/log/centreon-engine &&\
     chown -R centreon-broker:centreon /var/log/centreon-broker && chmod -R g+rx /var/log/centreon-broker && chmod -R g+w /var/log/centreon-broker &&\
     chmod g+w /var/lib/centreon/*
+
+# Generate a RSA key pair for user `centreon` and copy it somewhere where it may be served by Apache
+RUN su -c 'ssh-keygen -t rsa -f /centreon/.ssh/id_rsa -q -N ""' centreon &&\
+    cp /centreon/.ssh/id_rsa.pub /centreon/www/id_rsa.pub
+COPY files/etc/httpd/conf.d/centpubkey.conf /etc/httpd/conf.d/centpubkey.conf 
 
 # Set Europe/Paris for timezone.
 RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime &&\

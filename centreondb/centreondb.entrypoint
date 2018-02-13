@@ -12,7 +12,8 @@ MYSQLD   : $(mysqld --version |awk '{print $3}')
 #########################################
 EOF
 
-PID_FILE=/run/mysqld/mysqld.pid
+MARIADB_PID_FILE=/run/mysqld/mysqld.pid
+NRPE_PID_FILE=/var/run/nrpe.pid
 DATADIR=/var/lib/mysql
 
 # We go for MariaDB server setup only if /var/lib/mysql/mysql isn’t already a directory.
@@ -20,7 +21,7 @@ if [ ! -d "$DATADIR/mysql" ]
 then
     echo "MariaDB Initial setup…"
     mysql_install_db --force --skip-auth-anonymous-user --user=mysql
-    (mysqld_safe --pid-file="$PID_FILE" --datadir="$DATADIR" &) &&\
+    (mysqld_safe --pid-file="$MARIADB_PID_FILE" --datadir="$DATADIR" &) &&\
     sleep 4 &&\
     # Authorize root for the host named "centreon". This is needed by the Centreon setup process and may be removed afterward.
     echo "Setting privileges for the Centreon server…" &&\
@@ -32,7 +33,7 @@ then
     mysql -e "FLUSH PRIVILEGES" &&\
     echo "Setting MariaDB root password…" &&\
     mysqladmin -u root password "$MARIADB_ROOT_PASSWD" &&\
-    kill -15 $(cat $PID_FILE) &&\
+    kill -15 $(cat $MARIADB_PID_FILE) &&\
     echo "MariaDB initial setup OK."
     sleep 4 # LaRache© (let enough time for MariaDB to stop…)
 else
@@ -49,13 +50,14 @@ export CENTREON_DB_PASSWD=''
 # As mysqld is not our main process it won’t get the SIGTERM which is sent when the container is asked to stop, so trap and pass it.
 # Also trap SIGINT, SIGQUIT and SIGSTOP
 mariadb_stop() { echo " * MariaDB is shutting down…"
-                 kill -15 $(cat "$PID_FILE")
+                 kill -15 $(cat "$MARIADB_PID_FILE")
+                 kill -15 $(cat "$NRPE_PID_FILE")
                  kill -15 $DUMMY_PROCESS_PID
                  exit 0; }
 
 trap mariadb_stop 2 3 15 19
 
-mysqld_safe --pid-file="$PID_FILE" --datadir="$DATADIR" --log-error="mariadb.err" --user=mysql &
+mysqld_safe --pid-file="$MARIADB_PID_FILE" --datadir="$DATADIR" --log-error="mariadb.err" --user=mysql &
 
 while [ -z "$(pidof 'mysqld')" ]; do
     sleep 1
@@ -63,6 +65,9 @@ while [ -z "$(pidof 'mysqld')" ]; do
 done
 
 echo -e " MariaDB is running.\n"
+
+echo -e " * Starting NRPE… \n"
+/usr/bin/nrpe -c /etc/nrpe.cfg -d &
 
 # Start a dummy process which never terminates, to prevent the entrypoint to terminate itself if all its children have restarted…
 tail -f /dev/null &
