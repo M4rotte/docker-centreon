@@ -105,7 +105,7 @@ RUN echo '/centreon/lib' >> /etc/ld.so.conf && ldconfig &&\
     usermod -a -G centreon nrpe &&\
     usermod -a -G centreon nagios &&\
     mkdir -p /var/lib/centreon/nagios-perf/ /var/cache/centreon/backup &&\
-    mkdir /var/lib/centreon/.ssh && chmod 0700 /centreon/.ssh &&\
+    mkdir /var/lib/centreon/.ssh && chmod 0700 /var/lib/centreon/.ssh &&\
     chown -R centreon-engine:centreon /etc/centreon-engine && chmod -R g+rw /etc/centreon-engine &&\
     chown -R centreon-broker:centreon /etc/centreon-broker && chmod -R g+rw /etc/centreon-broker &&\
     chown -R centreon:centreon /etc/centreon && chmod -R g+rw /etc/centreon &&\

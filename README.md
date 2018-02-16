@@ -10,13 +10,21 @@ On [Docker Hub](https://hub.docker.com/search/?isAutomated=0&isOfficial=0&page=1
 
 There seems to be some [interesting](https://github.com/jpdurot/docker-centreon) [ressources](https://github.com/padelt/docker-centreon) on Docker Hub but I’m trying to do it myself, rather than testing those.
 
-One of the goals of this work is to learn Docker, and getting a better knowledge of Centreon’s internal, plus, I won’t bet the images available will work out-of-the-box nor will be easily adaptable for our current setup.
+One of the goals of this work is to learn Docker, and getting a better knowledge of Centreon’s internal, plus, I won’t bet the images available would work out-of-the-box nor will be easily adaptable for our current setup.
 
 ## What is done so far
 
 A central image with CLib, Broker, Engine, Connectors and Centreon Web. The setup (install.sh) is done during image creation but the Centreon configuration itself must be realized once the container is running. Having '/etc' being a Docker volume the configuration will persist across container restarts.
 
-Once the setup has took place, you must manually rename the '/centreon/www/install' directory (as '/centreon/www/install.done' for example) to prevent the installation to restart again and again. This may be a bug, I don’t know.
+Once the setup has took place, you must manually rename the '/centreon/www/install' directory (as '/centreon/www/install.done' for example) to prevent the installation to restart again and again. This may be a bug or a misconfiguration I made, I don’t know.
+
+The Centreon widget “Global health” is installed.
+
+A CLAPI export (of everything but the “TRAP” objects) exists at '/root/initial_setup.clapi' in the central’s container. It may be used to populate the database with some supervision objects. Just open a shell in the central container and issue the following command:
+
+    # /centreon/bin/centreon -u admin -p ***** -i /root/initial_setup.clapi
+
+(it’s important to provide an absolute path for the CLAPI input file)
 
 ### Database image
 
