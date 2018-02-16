@@ -56,6 +56,7 @@ This is the base part of Centreon.
 
 #### [Centreon Broker](https://github.com/centreon/centreon-broker)
 
+It has to be installed on both the central and the poller. The broker daemon must be running on the central server.
 
 #### [Centreon Engine](https://github.com/centreon/centreon-engine)
 
@@ -85,11 +86,15 @@ This is the MariaDB $DATADIR.
 
 #### centreon-etc:/etc
 
-The configuration of our Centreon server
+The configuration of our Centreon server.
 
 ### centreon-centreon-www:/centreon/www
 
-The Centreon Web’s document root
+The Centreon Web’s document root.
+
+### centreonpoller-etc:/etc
+
+The configuration of our Centreon poller.
 
 ## Directories
 

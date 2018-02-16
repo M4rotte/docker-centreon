@@ -34,43 +34,48 @@ RUN echo -e "[main]\nenabled=0" > /etc/yum/pluginconf.d/fastestmirror.conf &&\
 
 ## Create directories and set permissions
 RUN mkdir /centreon &&\
-    adduser -d /centreon -s /bin/bash -r centreon-engine &&\
-    adduser -d /centreon -s /bin/bash -r centreon-broker &&\
-    adduser -d /centreon -s /bin/bash -r centreon &&\
-    chown -R centreon:centreon /centreon &&\
-    usermod -a -G centreon apache &&\
+    mkdir /var/lib/centreon-broker &&\
+    mkdir -p /var/lib/centreon-engine/rw /var/lib/centreon/metrics /var/lib/centreon/status &&\
+    adduser -d /var/lib/centreon-engine -s /bin/bash -r centreon-engine &&\
+    adduser -d /var/lib/centreon-broker -s /bin/bash -r centreon-broker &&\
+    adduser -d /var/lib/centreon -s /bin/bash -r centreon &&\
+    chown -R centreon:centreon /centreon /var/lib/centreon &&\
     usermod -a -G centreon centreon-engine &&\
     usermod -a -G centreon centreon-broker &&\
-    mkdir /var/lib/centreon-broker && chown centreon-broker:centreon-broker /var/lib/centreon-broker &&\
-    mkdir -p /var/lib/centreon-engine/rw && chown -R centreon-engine:centreon /var/lib/centreon-engine &&\
-    mkdir -p /var/lib/centreon/metrics /var/lib/centreon/status && chown -R centreon:centreon /var/lib/centreon &&\
+    chown centreon-broker:centreon-broker /var/lib/centreon-broker &&\
+    chown -R centreon-engine:centreon /var/lib/centreon-engine &&\
+    chown -R centreon:centreon /var/lib/centreon &&\
     mkdir /var/log/centreon-engine && chown centreon-engine:centreon-engine /var/log/centreon-engine &&\
     mkdir /var/log/centreon-broker && chown centreon-broker:centreon /var/log/centreon-broker && chmod g+rwx /var/log/centreon-broker &&\
     mkdir /var/log/centreon && chown centreon:centreon /var/log/centreon &&\
     mkdir /etc/centreon && chown centreon:centreon /etc/centreon &&\
     mkdir /etc/centreon-engine && chown centreon-engine:centreon /etc/centreon-engine &&\
-    mkdir /etc/centreon-broker && chown centreon-broker:centreon /etc/centreon-broker &&\
-    mkdir /tmp/centreon-setup && chown centreon:centreon /tmp/centreon-setup && chmod g+rwx /tmp/centreon-setup
+    mkdir /etc/centreon-broker && chown centreon-broker:centreon /etc/centreon-broker
 
 ## Build and install CLib, Broker, Engine, Connectors, Centreon, Plugins ##
 WORKDIR /usr/local/src
 
 RUN git clone https://github.com/centreon/centreon-clib.git &&\
     cd centreon-clib && git checkout $CENTREON_CLIB_VERSION && cd build &&\
-    cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
+    cmake -DCMAKE_INSTALL_PREFIX=/centreon -DWITH_PACKAGE_RPM=yes . &&\
+    make -j3 && make install &&\
     cd /usr/local/src &&\
     git clone https://github.com/centreon/centreon-broker.git &&\
     cd centreon-broker && git checkout $CENTREON_BROKER_VERSION && cd build &&\ 
-    cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
+    cmake -DCMAKE_INSTALL_PREFIX=/centreon -DWITH_PACKAGE_RPM=yes . &&\
+    make -j3 && make install &&\
     cd /usr/local/src &&\
     git clone https://github.com/centreon/centreon-engine.git &&\
     cd centreon-engine && git checkout $CENTREON_ENGINE_VERSION && cd build &&\
-    cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
+    cmake -DCMAKE_INSTALL_PREFIX=/centreon -DWITH_PACKAGE_RPM=yes . &&\
+    make -j3 && make install &&\
     cd /usr/local/src &&\
     git clone https://github.com/centreon/centreon-connectors.git &&\
     cd centreon-connectors && git checkout $CENTREON_CONNECTORS_VERSION &&\
-    cd ssh/build && cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
-    cd ../../perl/build && cmake -DCMAKE_INSTALL_PREFIX=/centreon . && make -j3 && make install &&\
+    cd ssh/build && cmake -DCMAKE_INSTALL_PREFIX=/centreon -DWITH_PACKAGE_RPM=yes . &&\
+    make -j3 && make install &&\
+    cd ../../perl/build && cmake -DCMAKE_INSTALL_PREFIX=/centreon -DWITH_PACKAGE_RPM=yes . &&\
+    make -j3 && make install &&\
     cd /usr/local/src &&\
     git clone https://github.com/centreon/centreon.git &&\
     cd centreon && git checkout $CENTREON_CENTREON_VERSION &&\
@@ -128,7 +133,7 @@ RUN echo '/centreon/lib' >> /etc/ld.so.conf && ldconfig &&\
     chown -R centreon-engine:centreon /etc/centreon-engine && chmod -R g+rw /etc/centreon-engine &&\
     chown -R centreon-broker:centreon /etc/centreon-broker && chmod -R g+rw /etc/centreon-broker &&\
     chown -R centreon:centreon /etc/centreon && chmod -R g+rw /etc/centreon &&\
-    chown -R centreon:centreon /centreon && chmod -R g+rwx /centreon &&\
+    chown -R centreon:centreon /centreon && chmod 0700 /centreon && chmod -R g+rwx /centreon/* &&\
     chown -R centreon:centreon /var/cache/centreon && chmod -R g+rwx /var/cache/centreon &&\
     chown -R centreon-engine:centreon /var/lib/centreon-engine && chmod -R g+rx /var/lib/centreon-engine && chmod -R g+w /var/lib/centreon-engine &&\
     chown -R centreon-broker:centreon /var/lib/centreon-broker && chmod -R g+rx /var/lib/centreon-broker && chmod -R g+w /var/lib/centreon-broker &&\

@@ -67,8 +67,6 @@ echo -e " * Starting NRPE… \n"
 tail -f /dev/null &
 DUMMY_PROCESS_PID=$!
 
-sleep 2 && ps -Hef |tail -n +2
-
 wait
 
 

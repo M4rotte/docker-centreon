@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<centreonBroker>
+ <broker_id><![CDATA[4]]></broker_id>
+ <broker_name><![CDATA[poller-1-module]]></broker_name>
+ <poller_id><![CDATA[2]]></poller_id>
+ <poller_name><![CDATA[Poller1]]></poller_name>
+ <module_directory><![CDATA[/centreon/lib/centreon-broker]]></module_directory>
+ <log_timestamp><![CDATA[1]]></log_timestamp>
+ <log_thread_id><![CDATA[1]]></log_thread_id>
+ <event_queue_max_size><![CDATA[10000]]></event_queue_max_size>
+ <command_file><![CDATA[]]></command_file>
+ <cache_directory><![CDATA[/var/lib/centreon-broker]]></cache_directory>
+ <logger>
+  <name><![CDATA[/var/log/centreon-broker/poller-module.log]]></name>
+  <config><![CDATA[yes]]></config>
+  <debug><![CDATA[no]]></debug>
+  <error><![CDATA[yes]]></error>
+  <info><![CDATA[no]]></info>
+  <level><![CDATA[low]]></level>
+  <type><![CDATA[file]]></type>
+ </logger>
+ <output>
+  <name><![CDATA[Central]]></name>
+  <port><![CDATA[5669]]></port>
+  <host><![CDATA[centreon]]></host>
+  <protocol><![CDATA[bbdo]]></protocol>
+  <negociation><![CDATA[yes]]></negociation>
+  <tls><![CDATA[no]]></tls>
+  <compression><![CDATA[auto]]></compression>
+  <type><![CDATA[ipv4]]></type>
+ </output>
+</centreonBroker>

@@ -2,7 +2,6 @@
 
 graceful_exit() {
     echo "Was asked to terminate myself…" >&2
-    httpd -k stop
     kill -15 $(cat /var/run/snmpd.pid) && rm -f /var/run/snmpd.pid
     /etc/init.d/centengine stop
     kill -15 $(cat /run/nrpe/nrpe.pid) && echo "NRPE server has been stopped."
@@ -26,6 +25,10 @@ NRPE DAEMON     : $(/usr/sbin/nrpe -V |awk '{if (NR>1) print $2}')
 ########################################
 EOF
 
+# Get the SSH public key of the Central server to authorize user “centreon” to connect from the central to the poller
+curl centreon/centpubkey >> /var/lib/centreon/.ssh/authorized_keys && chown centreon:centreon /var/lib/centreon/.ssh/authorized_keys &&\
+     chmod 0600 /var/lib/centreon/.ssh/authorized_keys
+
 # Should this rather be done at build time?
 sed -i -e "s/\;date.timezone =/date.timezone = Europe\/Paris/" /etc/php.ini
 
@@ -42,8 +45,6 @@ echo -e " * Starting NRPE… \n"
 # Start a dummy process which never terminates, to prevent the entrypoint to terminate itself if all its children have restarted…
 tail -f /dev/null &
 DUMMY_PROCESS_PID=$!
-
-sleep 2 && ps -Hef |tail -n +2
 
 wait
 
