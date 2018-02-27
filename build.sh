@@ -49,6 +49,8 @@ function flatten {
 
 echo -e "\n  *** Centreon docker images creation ***\n"
 
+prune_docker
+
 grep ^CENTREON .env
 
 for service in ${SERVICES}; do

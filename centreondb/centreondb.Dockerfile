@@ -17,8 +17,12 @@ RUN apk add --no-cache tzdata &&\
 ## Configure NRPE server
 RUN sed -i -e 's/allowed_hosts=127.0.0.1/allowed_hosts=127.0.0.1,centreon/' /etc/nrpe.cfg
 
+## Configure MariaDB
+COPY files/etc/mysql/my.cnf /etc/mysql/my.cnf
+
 ## Remove some files ##
 ## Add some information in the MOTD file ##
+COPY files/etc/motd-centreondb /etc/motd
 RUN rm -rf /var/cache/apk/* /tmp/* \
            /etc/modprobe.d /etc/modules-load.d /etc/modules \
            /etc/udhcpd.conf /etc/securetty &&\
@@ -29,7 +33,8 @@ RUN rm -rf /var/cache/apk/* /tmp/* \
 COPY centreondb.entrypoint /entrypoint
 
 # Files and perms
-RUN chmod go-rwx /entrypoint
+RUN chmod go-rwx /entrypoint &&\
+    chmod 0755 /etc/mysql/my.cnf
 
 WORKDIR /
 USER root

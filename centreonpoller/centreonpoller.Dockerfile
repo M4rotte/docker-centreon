@@ -29,7 +29,7 @@ RUN echo -e "[main]\nenabled=0" > /etc/yum/pluginconf.d/fastestmirror.conf &&\
                        php-pear nagios-plugins-all nagios-plugins-nrpe redhat-lsb-core sendmail mailx sudo perl net-snmp-perl perl-XML-LibXML \
                        perl-JSON perl-libwww-perl perl-XML-XPath perl-Net-Telnet perl-Net-DNS perl-DBI perl-DBD-MySQL perl-DBD-Pg \
                        perl-File-Find-Object perl-Pod-Parser which openssh-clients \
-                       qt-mysql tzdata libssh2-devel libgcrypt-devel perl-libintl
+                       qt-mysql tzdata libssh2-devel libgcrypt-devel perl-libintl openssh-server openssh-server-sysvinit
 
 ## Create directories and set permissions
 RUN mkdir /centreon &&\
@@ -96,14 +96,16 @@ RUN sed -i -e 's/allowed_hosts=127.0.0.1/allowed_hosts=127.0.0.1,centreon/' \
 ## Do some configuration
 COPY files/etc/centreon/conf.pm /etc/centreon/conf.pm
 COPY files/etc/centreon-engine/* /etc/centreon-engine/
-COPY files/etc/centreon-broker/* /etc/centreon-broker
+COPY files/etc/centreon-broker/* /etc/centreon-broker/
 COPY files/etc/init.d/centengine /etc/init.d/centengine
+COPY files/etc/sudoers.d/centreon /etc/sudoers.d/centreon
 
 ## More configuration ##
 ## Files’s owner/group are explicitly set again because the Centreon install script may have screw them…
 RUN echo '/centreon/lib' >> /etc/ld.so.conf && ldconfig &&\
     usermod -a -G centreon nrpe &&\
     usermod -a -G centreon nagios &&\
+    chmod 0440 /etc/sudoers.d/centreon &&\
     mkdir -p /var/lib/centreon/nagios-perf/ /var/cache/centreon/backup &&\
     mkdir /var/lib/centreon/.ssh && chmod 0700 /var/lib/centreon/.ssh &&\
     chown -R centreon-engine:centreon /etc/centreon-engine && chmod -R g+rw /etc/centreon-engine &&\
@@ -115,7 +117,8 @@ RUN echo '/centreon/lib' >> /etc/ld.so.conf && ldconfig &&\
     chown -R centreon-broker:centreon /var/lib/centreon-broker && chmod -R g+rwx /var/lib/centreon-broker &&\
     chown -R centreon-engine:centreon /var/log/centreon-engine && chmod -R g+rwx /var/log/centreon-engine &&\
     chown -R centreon-broker:centreon /var/log/centreon-broker && chmod -R g+rwx /var/log/centreon-broker &&\
-    chmod g+w /var/lib/centreon/*
+    chmod g+w /var/lib/centreon/* &&\
+    chmod 0770 /centreon
 
 
 # Set Europe/Paris for timezone.
@@ -141,7 +144,8 @@ RUN rm -rf /var/cache/yum/* \
 COPY centreonpoller.entrypoint /entrypoint
 
 ## Files & perms
-RUN chmod go-rwx /entrypoint
+RUN chmod go-rwx /entrypoint &&\
+    chmod 0644 /etc/motd
 
 WORKDIR /
 USER root

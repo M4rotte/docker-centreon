@@ -25,11 +25,11 @@ then
     sleep 4 &&\
     # Authorize root for the host named "centreon". This is needed by the Centreon setup process and may be removed afterward.
     echo "Setting privileges for the Centreon server…" &&\
-    mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'centreon.%' IDENTIFIED BY \"$MARIADB_ROOT_PASSWD\" WITH GRANT OPTION" &&\
-    mysql -e "GRANT PROXY ON ''@'%' TO 'root'@'centreon.%' WITH GRANT OPTION" &&\
+    mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY \"$MARIADB_ROOT_PASSWD\" WITH GRANT OPTION" &&\
+    mysql -e "GRANT PROXY ON ''@'%' TO 'root'@'%' WITH GRANT OPTION" &&\
     # The following grants should not be necessary (as it’s done by the Centreon setup process). It probably could be removed.
-    mysql -e "GRANT ALL PRIVILEGES ON centreon.* TO 'centreon'@'centreon.%' IDENTIFIED BY \"$CENTREON_DB_PASSWD\"" &&\
-    mysql -e "GRANT ALL PRIVILEGES ON centreon_storage.* TO 'centreon'@'centreon.%' IDENTIFIED BY \"$CENTREON_DB_PASSWD\"" &&\
+    #mysql -e "GRANT ALL PRIVILEGES ON centreon.* TO 'centreon'@'centreon.%' IDENTIFIED BY \"$CENTREON_DB_PASSWD\"" &&\
+    #mysql -e "GRANT ALL PRIVILEGES ON centreon_storage.* TO 'centreon'@'centreon.%' IDENTIFIED BY \"$CENTREON_DB_PASSWD\""
     mysql -e "FLUSH PRIVILEGES" &&\
     echo "Setting MariaDB root password…" &&\
     mysqladmin -u root password "$MARIADB_ROOT_PASSWD" &&\

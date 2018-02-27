@@ -2,6 +2,7 @@
 
 graceful_exit() {
     echo "Was asked to terminate myself…" >&2
+    /etc/init.d/sshd stop
     kill -15 $(cat /var/run/snmpd.pid) && rm -f /var/run/snmpd.pid
     /etc/init.d/centengine stop
     kill -15 $(cat /run/nrpe/nrpe.pid) && echo "NRPE server has been stopped."
@@ -26,15 +27,20 @@ NRPE DAEMON     : $(/usr/sbin/nrpe -V |awk '{if (NR>1) print $2}')
 EOF
 
 # Get the SSH public key of the Central server to authorize user “centreon” to connect from the central to the poller
-curl centreon/centpubkey >> /var/lib/centreon/.ssh/authorized_keys && chown centreon:centreon /var/lib/centreon/.ssh/authorized_keys &&\
+curl --noproxy centreon http://centreon/centpubkey >> /var/lib/centreon/.ssh/authorized_keys &&\
+     chown -R centreon:centreon /var/lib/centreon/.ssh &&\
      chmod 0600 /var/lib/centreon/.ssh/authorized_keys
 
 # Should this rather be done at build time?
 sed -i -e "s/\;date.timezone =/date.timezone = Europe\/Paris/" /etc/php.ini
 
-## Starting SNMP daemon. This is optionnal.
-echo -e " * Starting SNMP Daemon… \n"
+## Starting SNMP server. This is optionnal.
+echo -e " * Starting SNMP server… \n"
 /usr/sbin/snmpd -LS0-6d -Lf /dev/null -p /var/run/snmpd.pid &
+
+## Starting SSH server.
+echo -e " * Starting SSH server… \n"
+/etc/init.d/sshd start
 
 echo -e " * Starting Centreon Engine… \n"
 /etc/init.d/centengine start

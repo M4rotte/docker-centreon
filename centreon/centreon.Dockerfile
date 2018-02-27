@@ -33,18 +33,19 @@ RUN echo -e "[main]\nenabled=0" > /etc/yum/pluginconf.d/fastestmirror.conf &&\
                        qt-mysql tzdata libssh2-devel libgcrypt-devel php-intl perl-libintl
 
 ## Create directories and set permissions
-RUN mkdir /centreon &&\
+RUN mkdir -p /centreon /home/centreon/.ssh &&\
     mkdir /var/lib/centreon-broker &&\
     mkdir -p /var/lib/centreon-engine/rw /var/lib/centreon/metrics /var/lib/centreon/status &&\
     adduser -d /var/lib/centreon-engine -s /bin/bash -r centreon-engine &&\
     adduser -d /var/lib/centreon-broker -s /bin/bash -r centreon-broker &&\
-    adduser -d /var/lib/centreon -s /bin/bash -r centreon &&\
-    chown -R centreon:centreon /centreon /var/lib/centreon &&\
+    adduser -d /home/centreon -s /bin/bash -r centreon &&\
+    chown -R centreon:centreon /centreon /var/lib/centreon && chmod -R g+rwx /centreon /var/lib/centreon &&\
+    chmod -R o-rwx /centreon /var/lib/centreon &&\
+    chown -R centreon:centreon /home/centreon && chmod -R go-rwx /home/centreon &&\
     usermod -a -G centreon centreon-engine &&\
     usermod -a -G centreon centreon-broker &&\
     chown centreon-broker:centreon-broker /var/lib/centreon-broker &&\
     chown -R centreon-engine:centreon /var/lib/centreon-engine &&\
-    chown -R centreon:centreon /var/lib/centreon &&\
     mkdir /var/log/centreon-engine && chown centreon-engine:centreon-engine /var/log/centreon-engine &&\
     mkdir /var/log/centreon-broker && chown centreon-broker:centreon /var/log/centreon-broker && chmod g+rwx /var/log/centreon-broker &&\
     mkdir /var/log/centreon && chown centreon:centreon /var/log/centreon &&\
@@ -119,12 +120,12 @@ RUN touch /etc/sudoers.d/centreon &&\
     ./install.sh -v -i -f /root/centreon-template
 
 COPY files/etc/centreon/conf.pm /etc/centreon/conf.pm
-COPY files/etc/centreon-broker /etc/centreon-broker
+COPY files/etc/centreon-broker/* /etc/centreon-broker/
 COPY files/etc/centreon-engine/* /etc/centreon-engine/
 COPY files/etc/init.d/centengine /etc/init.d/centengine
 
 ## More configuration ##
-## Files’s owner/group are explicitly set again because the Centreon install script may have screw them…
+## Files’s owner/group are explicitly set again because the Centreon install script may have screw them and new files may have been added…
 RUN echo '/centreon/lib' >> /etc/ld.so.conf && ldconfig &&\
     usermod -a -G centreon nrpe &&\
     usermod -a -G centreon nagios &&\
@@ -133,17 +134,17 @@ RUN echo '/centreon/lib' >> /etc/ld.so.conf && ldconfig &&\
     chown -R centreon-engine:centreon /etc/centreon-engine && chmod -R g+rw /etc/centreon-engine &&\
     chown -R centreon-broker:centreon /etc/centreon-broker && chmod -R g+rw /etc/centreon-broker &&\
     chown -R centreon:centreon /etc/centreon && chmod -R g+rw /etc/centreon &&\
-    chown -R centreon:centreon /centreon && chmod 0700 /centreon && chmod -R g+rwx /centreon/* &&\
+    chown -R centreon:centreon /centreon && chmod -R 0770 /centreon &&\
     chown -R centreon:centreon /var/cache/centreon && chmod -R g+rwx /var/cache/centreon &&\
     chown -R centreon-engine:centreon /var/lib/centreon-engine && chmod -R g+rx /var/lib/centreon-engine && chmod -R g+w /var/lib/centreon-engine &&\
     chown -R centreon-broker:centreon /var/lib/centreon-broker && chmod -R g+rx /var/lib/centreon-broker && chmod -R g+w /var/lib/centreon-broker &&\
     chown -R centreon-engine:centreon /var/log/centreon-engine && chmod -R g+rx /var/log/centreon-engine && chmod -R g+w /var/log/centreon-engine &&\
     chown -R centreon-broker:centreon /var/log/centreon-broker && chmod -R g+rx /var/log/centreon-broker && chmod -R g+w /var/log/centreon-broker &&\
-    chmod g+w /var/lib/centreon/*
+    chmod -R g+w /var/lib/centreon
 
 # Generate a RSA key pair for user `centreon` and copy it somewhere where it may be served by Apache
-RUN su -c 'ssh-keygen -t rsa -f /centreon/.ssh/id_rsa -q -N ""' centreon &&\
-    cp /centreon/.ssh/id_rsa.pub /centreon/www/id_rsa.pub
+RUN su -c 'ssh-keygen -t rsa -f /home/centreon/.ssh/id_rsa -q -N ""' centreon &&\
+    cp /home/centreon/.ssh/id_rsa.pub /centreon/www/id_rsa.pub
 COPY files/etc/httpd/conf.d/centpubkey.conf /etc/httpd/conf.d/centpubkey.conf 
 
 # Set Europe/Paris for timezone.
@@ -168,7 +169,8 @@ RUN rm -rf /var/cache/yum/* \
 COPY centreon.entrypoint /entrypoint
 
 ## Files & perms
-RUN chmod go-rwx /entrypoint
+RUN chmod go-rwx /entrypoint &&\
+    chmod 0644 /etc/motd
 
 EXPOSE 80/tcp
 

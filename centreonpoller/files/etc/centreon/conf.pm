@@ -9,7 +9,7 @@ $centreon_config = {
 };
 
 # Central or Poller ?
-$instance_mode = "central";
+$instance_mode = "poller";
 
 # Centreon Centcore Command File
 $cmdFile = "/var/lib/centreon/centcore.cmd";
