@@ -63,9 +63,9 @@ done
 
 echo -e "\n  ### All images have been built.\n"
 
-flatten centreon       '["/entrypoint"]' root /
-flatten centreondb     '["/entrypoint"]' root /
-flatten centreonpoller '["/entrypoint"]' root /
+#flatten centreon       '["/entrypoint"]' root /
+#flatten centreondb     '["/entrypoint"]' root /
+#flatten centreonpoller '["/entrypoint"]' root /
 
 echo -e "\n  ### All images have been flattened.\n"
 

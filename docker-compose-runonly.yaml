@@ -1,0 +1,58 @@
+version: "3.4"
+# This docker-compose file may only be used to run the stack, not to build the images.
+volumes:
+  centreondb-var-lib-mysql:
+  centreon-etc:
+  centreon-centreon-www:
+  centreonpoller-etc:
+
+networks:
+  centreon-net:
+    external:
+      name: centreon-net
+
+services:
+  centreondb:
+    environment:
+     - MARIADB_ROOT_PASSWD=lepass 
+    image: harbor.hm.dm.ad/monitoring/centreondb:0.1
+    entrypoint:
+     - /entrypoint
+    container_name: centreondb
+    hostname: centreondb
+    networks:
+      centreon-net:
+          ipv4_address: "172.36.0.42"
+    volumes:
+     - centreondb-var-lib-mysql:/var/lib/mysql
+
+  centreon:
+    depends_on:
+     - centreondb
+    image: harbor.hm.dm.ad/monitoring/centreon:0.1
+    entrypoint:
+     - /entrypoint
+    container_name: centreon
+    hostname: centreon
+    networks:
+      centreon-net:
+          ipv4_address: "172.36.0.100"
+    ports:
+     - "5555:80"
+    volumes:
+     - centreon-etc:/etc
+     - centreon-centreon-www:/centreon/www
+
+  centreonpoller:
+    depends_on:
+     - centreon
+    image: harbor.hm.dm.ad/monitoring/centreonpoller:0.1
+    entrypoint:
+     - /entrypoint
+    container_name: centreonpoller
+    hostname: centreonpoller
+    networks:
+      centreon-net:
+          ipv4_address: "172.36.0.200"
+    volumes:
+     - centreonpoller-etc:/etc
