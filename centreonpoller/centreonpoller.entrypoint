@@ -35,6 +35,7 @@ echo -e "\n * Authorizing user “centreon” to connect from the central server
 curl --silent --location --noproxy "*" http://centreon/centpubkey >> /var/lib/centreon/.ssh/authorized_keys &&\
      chown -R centreon:centreon /var/lib/centreon/.ssh &&\
      chmod 0600 /var/lib/centreon/.ssh/authorized_keys
+## !!!! It is still required to log once manually with this key. TODO: Push poller host key onto central’s known_hosts file for user centreon
 
 # Should this rather be done at build time?
 sed -i -e "s/\;date.timezone =/date.timezone = Europe\/Paris/" /etc/php.ini
