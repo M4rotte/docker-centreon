@@ -1,6 +1,6 @@
 # Centreon Docker images
 
-This is a "work in progress" project. The v0.6 offers a minimal working setup, with one central/poller image and one database image.
+This is a "work in progress" project. The v0.7 offers a minimal working setup, with one central/poller image and one database image.
 
 A “poller-only” image is also available but it still lacks some configuration to make it work correctly.
 
