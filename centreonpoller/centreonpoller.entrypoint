@@ -1,7 +1,7 @@
 #!/bin/sh
 
 graceful_exit() {
-    echo "Was asked to terminate myself…" >&2
+    echo -e "\nWas asked to terminate myself…" >&2
     /etc/init.d/sshd stop
     kill -15 $(cat /var/run/snmpd.pid) && rm -f /var/run/snmpd.pid
     /etc/init.d/centengine stop
@@ -27,7 +27,12 @@ NRPE DAEMON     : $(/usr/sbin/nrpe -V |awk '{if (NR>1) print $2}')
 EOF
 
 # Get the SSH public key of the Central server to authorize user “centreon” to connect from the central to the poller
-curl --noproxy centreon http://centreon/centpubkey >> /var/lib/centreon/.ssh/authorized_keys &&\
+# First, we need the central server to be ready before downloading the key
+echo " * Waiting for the central server to be ready…\n"
+until [ "$(curl --silent --location --output /dev/null --write-out '%{http_code}' --fail --noproxy '*'  http://centreon/centpubkey)" = "200" ]; do printf '.'; sleep 1; done
+# Server responded, actually download the key and add it to the authorized_keys file.
+echo -e "\n * Authorizing user “centreon” to connect from the central server…"
+curl --silent --location --noproxy "*" http://centreon/centpubkey >> /var/lib/centreon/.ssh/authorized_keys &&\
      chown -R centreon:centreon /var/lib/centreon/.ssh &&\
      chmod 0600 /var/lib/centreon/.ssh/authorized_keys
 

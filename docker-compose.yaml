@@ -76,6 +76,7 @@ services:
        CENTREON_TIMEZONE: ${CENTREON_TIMEZONE}
     depends_on:
      - centreon
+     - centreondb
     image: oxyure/centreonpoller:latest
     entrypoint:
      - /entrypoint
