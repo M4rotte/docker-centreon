@@ -19,6 +19,7 @@ INSTANCE;setparam;Central;is_default;1
 INSTANCE;setparam;Central;ns_activate;1
 INSTANCE;setparam;Central;ns_status;0
 INSTANCE;setparam;Central;init_script;centengine
+INSTANCE;setparam;Central;init_system;systemv
 INSTANCE;setparam;Central;monitoring_engine;CENGINE
 INSTANCE;setparam;Central;nagios_bin;/centreon/bin/centengine
 INSTANCE;setparam;Central;nagiostats_bin;/centreon/bin/centenginestats
@@ -28,6 +29,20 @@ INSTANCE;setparam;Central;centreonbroker_module_path;/centreon/lib/centreon-brok
 INSTANCE;setparam;Central;centreonconnector_path;/centreon/lib/centreon-connector
 INSTANCE;setparam;Central;init_script_centreontrapd;centreontrapd
 INSTANCE;setparam;Central;snmp_trapd_path_conf;/etc/snmp/centreon_traps/
+INSTANCE;ADD;Poller1;172.36.0.200;22
+INSTANCE;setparam;Poller1;localhost;0
+INSTANCE;setparam;Poller1;is_default;0
+INSTANCE;setparam;Poller1;ns_activate;1
+INSTANCE;setparam;Poller1;ns_status;0
+INSTANCE;setparam;Poller1;init_script;centengine
+INSTANCE;setparam;Poller1;nagios_bin;/usr/sbin/centengine
+INSTANCE;setparam;Poller1;nagiostats_bin;/usr/sbin/centenginestats
+INSTANCE;setparam;Poller1;nagios_perfdata;/var/log/centreon-engine/service-perfdata
+INSTANCE;setparam;Poller1;centreonbroker_cfg_path;/etc/centreon-broker
+INSTANCE;setparam;Poller1;centreonbroker_module_path;/usr/share/centreon/lib/centreon-broker
+INSTANCE;setparam;Poller1;init_script_centreontrapd;centreontrapd
+INSTANCE;setparam;Poller1;snmp_trapd_path_conf;/etc/snmp/centreon_traps/
+INSTANCE;setparam;Poller1;centreonbroker_logs_path;/var/log/centreon-broker/watchdog.log
 TP;ADD;24x7;Always
 TP;setparam;24x7;tp_sunday;00:00-24:00
 TP;setparam;24x7;tp_monday;00:00-24:00
@@ -128,9 +143,9 @@ CMD;ADD;Used_disk_space;2;$USER1$/check_nt -H $HOSTADDRESS$ -v USEDDISKSPACE -l 
 CMD;setparam;Used_disk_space;enable_shell;0
 CMD;setparam;Used_disk_space;command_activate;1
 CMD;setparam;Used_disk_space;command_locked;0
-RESOURCECFG;ADD;$USER1$;/usr/lib64/nagios/plugins;Central;Nagios Plugins Path
+RESOURCECFG;ADD;$USER1$;/usr/lib64/nagios/plugins;Central|Poller1;Nagios Plugins Path
 RESOURCECFG;setparam;$USER1$;activate;1
-RESOURCECFG;ADD;$CENTREONPLUGINS$;/centreon/plugins;Central;Centreon Plugins Path
+RESOURCECFG;ADD;$CENTREONPLUGINS$;/centreon/plugins;Central|Poller1;Centreon Plugins Path
 RESOURCECFG;setparam;$CENTREONPLUGINS$;activate;1
 CENTBROKERCFG;ADD;central-broker-master;Central
 CENTBROKERCFG;SETPARAM;central-broker-master;filename;central-broker.xml
@@ -324,6 +339,96 @@ ENGINECFG;setparam;Centreon Engine Central;debug_verbosity;2
 ENGINECFG;setparam;Centreon Engine Central;cfg_file;centengine.cfg
 ENGINECFG;setparam;Centreon Engine Central;log_pid;1
 ENGINECFG;setparam;Centreon Engine Central;broker_module;/centreon/lib/centreon-engine/externalcmd.so|/centreon/lib/cbmod.so /etc/centreon-broker/central-module.xml
+ENGINECFG;ADD;Centreon Engine centreonpoller;Poller1;Centreon Engine configuration file
+ENGINECFG;setparam;Centreon Engine centreonpoller;log_file;/var/log/centreon-engine/centengine.log
+ENGINECFG;setparam;Centreon Engine centreonpoller;cfg_dir;/etc/centreon-engine/
+ENGINECFG;setparam;Centreon Engine centreonpoller;temp_file;/var/log/centreon-engine/centengine.tmp
+ENGINECFG;setparam;Centreon Engine centreonpoller;status_file;/var/log/centreon-engine/status.dat
+ENGINECFG;setparam;Centreon Engine centreonpoller;use_check_result_path;0
+ENGINECFG;setparam;Centreon Engine centreonpoller;status_update_interval;30
+ENGINECFG;setparam;Centreon Engine centreonpoller;nagios_user;centreon-engine
+ENGINECFG;setparam;Centreon Engine centreonpoller;nagios_group;centreon-engine
+ENGINECFG;setparam;Centreon Engine centreonpoller;enable_notifications;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;execute_service_checks;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;accept_passive_service_checks;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;execute_host_checks;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;accept_passive_host_checks;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;enable_event_handlers;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;log_rotation_method;d
+ENGINECFG;setparam;Centreon Engine centreonpoller;log_archive_path;/var/log/centreon-engine/archives/
+ENGINECFG;setparam;Centreon Engine centreonpoller;check_external_commands;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;external_command_buffer_slots;4096
+ENGINECFG;setparam;Centreon Engine centreonpoller;command_check_interval;1s
+ENGINECFG;setparam;Centreon Engine centreonpoller;command_file;/var/lib/centreon-engine/rw/centengine.cmd
+ENGINECFG;setparam;Centreon Engine centreonpoller;lock_file;/var/lock/subsys/centengine.lock
+ENGINECFG;setparam;Centreon Engine centreonpoller;retain_state_information;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;state_retention_file;/var/log/centreon-engine/retention.dat
+ENGINECFG;setparam;Centreon Engine centreonpoller;retention_update_interval;60
+ENGINECFG;setparam;Centreon Engine centreonpoller;use_retained_program_state;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;use_retained_scheduling_info;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;use_syslog;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;log_notifications;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;log_service_retries;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;log_host_retries;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;log_event_handlers;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;log_external_commands;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;log_passive_checks;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;sleep_time;0.2
+ENGINECFG;setparam;Centreon Engine centreonpoller;service_inter_check_delay_method;s
+ENGINECFG;setparam;Centreon Engine centreonpoller;host_inter_check_delay_method;s
+ENGINECFG;setparam;Centreon Engine centreonpoller;service_interleave_factor;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;max_concurrent_checks;400
+ENGINECFG;setparam;Centreon Engine centreonpoller;max_service_check_spread;5
+ENGINECFG;setparam;Centreon Engine centreonpoller;max_host_check_spread;5
+ENGINECFG;setparam;Centreon Engine centreonpoller;check_result_reaper_frequency;5
+ENGINECFG;setparam;Centreon Engine centreonpoller;max_check_result_reaper_time;10
+ENGINECFG;setparam;Centreon Engine centreonpoller;interval_length;60
+ENGINECFG;setparam;Centreon Engine centreonpoller;auto_reschedule_checks;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;use_aggressive_host_checking;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;enable_flap_detection;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;low_service_flap_threshold;25.0
+ENGINECFG;setparam;Centreon Engine centreonpoller;high_service_flap_threshold;50.0
+ENGINECFG;setparam;Centreon Engine centreonpoller;low_host_flap_threshold;25.0
+ENGINECFG;setparam;Centreon Engine centreonpoller;high_host_flap_threshold;50.0
+ENGINECFG;setparam;Centreon Engine centreonpoller;soft_state_dependencies;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;service_check_timeout;60
+ENGINECFG;setparam;Centreon Engine centreonpoller;host_check_timeout;10
+ENGINECFG;setparam;Centreon Engine centreonpoller;event_handler_timeout;30
+ENGINECFG;setparam;Centreon Engine centreonpoller;notification_timeout;30
+ENGINECFG;setparam;Centreon Engine centreonpoller;ocsp_timeout;5
+ENGINECFG;setparam;Centreon Engine centreonpoller;ochp_timeout;5
+ENGINECFG;setparam;Centreon Engine centreonpoller;perfdata_timeout;5
+ENGINECFG;setparam;Centreon Engine centreonpoller;obsess_over_services;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;obsess_over_hosts;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;process_performance_data;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;host_perfdata_file_mode;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;service_perfdata_file_mode;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;check_for_orphaned_services;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;check_service_freshness;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;check_host_freshness;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;date_format;euro
+ENGINECFG;setparam;Centreon Engine centreonpoller;illegal_object_name_chars;~!$%^&*"|'<>?,()=
+ENGINECFG;setparam;Centreon Engine centreonpoller;illegal_macro_output_chars;`~$^&"|'<>
+ENGINECFG;setparam;Centreon Engine centreonpoller;use_regexp_matching;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;use_true_regexp_matching;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;admin_email;admin@localhost
+ENGINECFG;setparam;Centreon Engine centreonpoller;admin_pager;admin
+ENGINECFG;setparam;Centreon Engine centreonpoller;nagios_activate;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;event_broker_options;-1
+ENGINECFG;setparam;Centreon Engine centreonpoller;translate_passive_host_checks;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;enable_predictive_host_dependency_checks;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;enable_predictive_service_dependency_checks;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;passive_host_checks_are_soft;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;use_large_installation_tweaks;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;enable_environment_macros;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;use_setpgid;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;debug_file;/var/log/centreon-engine/centengine.debug
+ENGINECFG;setparam;Centreon Engine centreonpoller;debug_verbosity;2
+ENGINECFG;setparam;Centreon Engine centreonpoller;max_debug_file_size;1000000000
+ENGINECFG;setparam;Centreon Engine centreonpoller;daemon_dumps_core;0
+ENGINECFG;setparam;Centreon Engine centreonpoller;cfg_file;centengine.cfg
+ENGINECFG;setparam;Centreon Engine centreonpoller;log_pid;1
+ENGINECFG;setparam;Centreon Engine centreonpoller;broker_module;/centreon/lib/centreon-engine/externalcmd.so|/centreon/lib/cbmod.so /etc/centreon-broker/poller-module.xml
 CONTACT;ADD;Jolly Roger;admin;jr@example.com;md5__c3284d0f94606de1fd2af172aba15bf3;1;1;en_US;local
 CONTACT;setparam;admin;hostnotifperiod;24x7
 CONTACT;setparam;admin;svcnotifperiod;24x7
@@ -426,7 +531,7 @@ HOST;setparam;centreondb;timezone;0
 HOST;setparam;centreondb;host_locked;0
 HOST;setparam;centreondb;host_register;1
 HOST;setparam;centreondb;host_activate;1
-HOST;ADD;centreonpoller;Poller externe;127.0.0.1;;;
+HOST;ADD;centreonpoller;Poller externe;172.36.0.200;;Poller1;
 HOST;setparam;centreonpoller;host_active_checks_enabled;2
 HOST;setparam;centreonpoller;host_passive_checks_enabled;2
 HOST;setparam;centreonpoller;host_checks_enabled;2
