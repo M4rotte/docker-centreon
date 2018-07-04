@@ -32,6 +32,8 @@ A CLAPI export (of everything but the “TRAP” objects) exists at '/root/initi
 
 It’s based on Alpine and it’s not as complete as the Debian based official MariaDB docker image. To run Centreon you can (and probably should) use the official image as your backend.
 
+Alpine Linux may sound as a perfect candidate for containers, because it’s tiny in RAM, but the fact it’s built on top of busybox and ulibc, instead of GNU tools and GNU libc, makes it harder to work with in a FOSS world, where the GNU libc still is the norm and so widely deployed. I encoutered problems with this database image : it was working fine on my personnal dev Docker engine setup, but it did not when I moved it on our corporate plateforme.
+
 MariaDB is installed from the packages available in Alpine 3.6 (MariaDB version is 10.1.26). The image is named 'centreondb'.
 
 If '/var/lib/mysql/mysql' is not a directory then MariaDB is run once to:
@@ -177,12 +179,21 @@ A container for our supervision requests tool.
 
 ## More things to try
 
- - Use Nginx in place of Apache
- - Remove all unused filed in /centreon (upstream default configuration mostly). Just to be sure we know precisely which files are needed by the Centreon application and which files aren’t…
+### Nginx
+
+Use Nginx in place of Apache
+
+### Directory structures
+
+Remove all unused filed in /centreon (upstream default configuration mostly). Just to be sure we know precisely which files are needed by the Centreon application and which files aren’t…
+ 
+### Alpine for poller
+
+Maybe Alpine is well fitted to act as a poller. Booting fast is more important for a poller than for a bdd or central, so it makes sense. But, this poller would may not be able to run any programme which can’t be compiled against ulibc.
 
 ### Centreon installation
 
-Master all the Centreon toolchain, middleware + applications, from PHP to Centreon, by following the different upstreams and installing from source.
+Master all the Centreon toolchain, middleware + applications, from PHP to Centreon, by following the different upstreams and installing from source. Search for compile-time optimisations and intersting features we could benefit, or, features we can disable to save some ressources.
 
  - PHP
  - MariaDB
@@ -191,5 +202,10 @@ Master all the Centreon toolchain, middleware + applications, from PHP to Centre
  - Nagios plugins
  - …
 
+### Corporate installation
 
+Once the current existing (or new) templating (and ACL/command/ressources), which is required for our different tools, has been precisely established. An inital CLAPI file, to be run at first central container start, to populate Centreon (central & poller) with all corporate objects have to be created.
 
+### Logs
+
+ - Redirect interesting logs to Logstash.
