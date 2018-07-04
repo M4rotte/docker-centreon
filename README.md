@@ -4,7 +4,7 @@ This is a "work in progress" project. The v0.8 offers a minimal working setup, w
 
 A “poller-only” image is also available.
 
-The Centreon central image is based on the CentOS 7 official image, while the database image is based on the official Alpine 3.6 image. You can use the central image with any other MariaDB or MySQL image. Using a standard image for the database only need you to make the necessary SQL command to grant the central to connect to do the initial setup. You can find this command in the [related entrypoint Bash script](https://github.com/M4rotte/docker-centreon/blob/master/centreondb/centreondb.entrypoint).
+The Centreon central image is based on the CentOS 7 official image, while the database image is based on the official Alpine 3.6 image. You can use the central image with any other MariaDB or MySQL image. Using a standard image for the database only need you to make the necessary SQL command to grant the central the right to connect to do the initial Centreon’s setup. You can find this command in the [related entrypoint Bash script](https://github.com/M4rotte/docker-centreon/blob/master/centreondb/centreondb.entrypoint). 
 
 ## A bit of history
 
