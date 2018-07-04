@@ -58,7 +58,15 @@ Running Centreon with separated PHP and Web servers, seems a bit out of hand, at
 
 In the first place, I stick to Apache for the web server. Nginx may be another good choice to consider. I find it quite simpler to configure and operate, but being unaware of how Centreon is dependent of Apache I stay with the latter.
 
-Centreon, in contrast, is being built from source. I’m using the [sources available on GitHub](https://github.com/centreon/centreon), the branch of every component may be chosen using build arguments.
+Centreon, in contrast, is being built from source. I’m using the [sources available on GitHub](https://github.com/centreon/centreon), the branch (or tag) of every component may be chosen using build arguments. The choices though dont’ seem to be enormous for a production environement… Many parts of the Centeron suite (including the core: CLib…) are in the process of being rewritten, and the new major versions of those programs aren’t finished and still not working as expected. I won’t detail the versions I used because it may not be relevant the time you’re reading this… You should probably follow the versions which are currently packaged in the CES distribution. So you know what to indicate in the build environment in case you decide to build the image. The variables are :
+
+ - CENTREON_CLIB_VERSION
+ - CENTREON_ENGINE_VERSION
+ - CENTREON_BROKER_VERSION
+ - CENTREON_CONNECTORS_VERSION
+ - CENTREON_CENTREON_VERSION
+
+and must contain a tag or a branch name.
 
 The builds are made on the container itself (ie: there is no separate builder). I should probably change that in the futur but it’s not a priority for me (except if someone convince me of the contrary).
 
@@ -66,7 +74,7 @@ The image is named `centreon`
 
 ### [Centreon CLib](https://github.com/centreon/centreon-clib)
 
-This is the base part of Centreon.
+This is the base part of Centreon. No serious warning, not even a trivial one… should be ignored nor accepted in the building of this part… Quoting the [documentation](https://documentation.centreon.com/docs/centreon-clib/en/latest/release_notes/centreon_clib_1_0_0.html#first-release) : “_Centreon Clib is a common library for all Centreon products written in C/C++. This project provides high level implementation of many basic system mechanism. The target is to have a portable and powerful implementation._”
 
 #### [Centreon Broker](https://github.com/centreon/centreon-broker)
 
