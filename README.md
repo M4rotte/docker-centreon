@@ -4,7 +4,7 @@ This is a "work in progress" project. The v0.8 offers a minimal working setup, w
 
 A “poller-only” image is also available.
 
-The Centreon central image is based on the CentOS 7 official image, while the database image is based on the official Alpine 3.6 image.
+The Centreon central image is based on the CentOS 7 official image, while the database image is based on the official Alpine 3.6 image. You can use the central image with any other MariaDB or MySQL image. Using a standard image for the database only need you to make the necessary SQL command to grant the central to connect to do the initial setup. You can find this command in the [related entrypoint Bash script](https://github.com/M4rotte/docker-centreon/blob/master/centreondb/centreondb.entrypoint).
 
 ## A bit of history
 
@@ -16,7 +16,7 @@ One of the goals of this work is to learn Docker, and getting a better knowledge
 
 ## What is done so far
 
-A central image with CLib, Broker, Engine, Connectors and Centreon Web. The setup (install.sh) is done during image creation but the Centreon configuration itself must be realized once the container is running. Having '/etc' being a Docker volume the configuration will persist across container restarts.
+A central image with CLib, Broker, Engine, Connectors and Centreon Web. The setup (install.sh) is done during image creation but the Centreon configuration itself must be realized once the container is running. Having '/etc' being a Docker volume makes the configuration persist across container restarts.
 
 Once the setup has took place, you must manually rename the '/centreon/www/install' directory (as '/centreon/www/install.done' for example) to prevent the installation to restart again and again. This may be a bug or a misconfiguration I made, I don’t know.
 
@@ -30,7 +30,7 @@ A CLAPI export (of everything but the “TRAP” objects) exists at '/root/initi
 
 ### Database image
 
-It’s based on Alpine and it’s not as complete as the Debian based official MariaDB docker image. To run Centreon you may (and probably should) use the official image as your backend.
+It’s based on Alpine and it’s not as complete as the Debian based official MariaDB docker image. To run Centreon you can (and probably should) use the official image as your backend.
 
 MariaDB is installed from the packages available in Alpine 3.6 (MariaDB version is 10.1.26). The image is named 'centreondb'.
 
@@ -40,9 +40,13 @@ If '/var/lib/mysql/mysql' is not a directory then MariaDB is run once to:
  2) set the root password (from an env. variable)
  3) set grants necessary for root to connect from the central with password
  
-Then (or if the server is already configured) MariaDB is run to listen to requests.
+Then (or if the server was already configured) MariaDB is run to listen to requests.
 
-The 'mysqld' process is killed with SIGTERM (so is gracefuly terminated) whatever the container receive SIGINT, SIGTERM, SIGQUIT or SIGSTOP.
+#### Entrypoint
+
+Entrypoint is a Bash script.
+
+The 'mysqld' process is killed with SIGTERM (so is gracefuly terminated [according to MariaDB documentation](https://mariadb.com/kb/en/library/shutdown/)) whatever the container receive SIGINT, SIGTERM, SIGQUIT or SIGSTOP.
 
 '/var/lib/mysql' is, of course, a Docker volume.
 
@@ -52,7 +56,7 @@ I’m aware of the availability of Centreon packaged in RPM. While this is (very
 
 Running Centreon with separated PHP and Web servers, seems a bit out of hand, at least for me. To simplify the problem I will try to have one container with all the necessary things. This image will, at first, be a Centreon poller too.
 
-In the first place, I stick to Apache for the web server. Nginx may be another good choice to consider. I find it quite simpler to configure and operate, but being unaware of how Centreon is dependent of Apache I stay with the latter. 
+In the first place, I stick to Apache for the web server. Nginx may be another good choice to consider. I find it quite simpler to configure and operate, but being unaware of how Centreon is dependent of Apache I stay with the latter.
 
 Centreon, in contrast, is being built from source. I’m using the [sources available on GitHub](https://github.com/centreon/centreon), the branch of every component may be chosen using build arguments.
 
@@ -123,17 +127,17 @@ The configuration of our Centreon poller.
 
 #### Nagios plugins
 
-Legacy monitoring plugins are currently installed from the package available in the system.
+Legacy monitoring plugins are currently installed from the package available in the system. It would benefit to be installed from the Github repository. Our corporate plugins should be installed the same.
 
 #### Centreon files and directories 
 
-All binaries related to Centreon are in /centreon (it’s used as installation prefix for all builds)
+The directory structures can probably be improved…
+
+All binaries related to Centreon are mixed in /centreon (it’s used as installation prefix for **all** builds)
 
  - /centreon
  
-As it’s used as installation prefix, it also contains the default configurations for each Centreon composants, but we will never use those files.
-
-Configuration, logs and variable data (metrics, status) are stored in the system default directories:
+As it’s used as installation prefix, it also contains the default configurations for each Centreon composants. We will never use those files, instead, configuration, logs and variable data (metrics, status) are stored in the system default directories:
 
  - /var/lib/centreon-broker
  - /var/lib/centreon-engine
@@ -145,9 +149,11 @@ Configuration, logs and variable data (metrics, status) are stored in the system
  - /etc/centreon-engine
  - /etc/centreon-broker
 
+This is how I wanted it to work. I’m still not 100% sure that the files in /centreon aren’t need at all. The Centreon install process is quite complex and should be studied more deeply.
+
 ## If this POC is successful 
 
-What’s next…
+What’s next… Things that would need to be done if we start the projet to have Centreon managed as Docker containers.
 
 ### Downtimes
 
@@ -160,6 +166,11 @@ A container for our inventory synchronization tool.
 ### Supervision Request
 
 A container for our supervision requests tool.
+
+## More things to try
+
+ - Use Nginx in place of Apache
+ - Remove all unused filed in /centreon (upstream default configuration mostly). Just to be sure we know precisely which files are needed by the Centreon application and which files aren’t…
 
 ### Centreon installation
 
