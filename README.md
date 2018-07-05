@@ -90,7 +90,9 @@ The monitoring engine is independent (ie: may be used without Centreon).
 
 Both SSH and Perl connectors are built but some configuration remains to do. Connectors aren’t use in out current setup but are a promising functionality.
 
-The SSH connector permits to maintain SSH connections between the poller and the supervised hosts, thus permiting to issue checks by SSH at a quite low cost.
+The SSH connector permits to maintain SSH connections between the poller and the supervised hosts, thus permiting to issue checks by SSH at a quite low cost. It so permits to avoid the necessity of the NRPE agent on every hosts where a SSH server is available.
+
+The Perl connector permits to save calling the interpreter for each check. It’s another subject which also needs more studies and tests.
 
 #### [Centreon](https://github.com/centreon/centreon)
 
