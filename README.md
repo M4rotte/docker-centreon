@@ -98,6 +98,9 @@ The Perl connector permits to save calling the interpreter for each check. It’
 
 Most of the application is written in PHP (+ some parts in Perl). As a downside for integration, it depends on PHP < 5.5 (NB: strictly inferior), thus restricting the choice of distribution. Currently (02/2018), CentOS 7 seems to be the only, still maintained, distribution offering PHP 5.4…
 
+03/08/19 EDIT: The last Centreon Web versions, from 18.10.1, are now supporting PHP 7. I didn’t manage to test to build the image against the the very last sources though…
+
+
 The initial Centreon upgrade (install/upgrade.php) which takes place the first time keeps restarting again for an unknown reason. So after it took place, you need to manually connect to the container and `mv /centreon/www/install /centreon/www/install.done`
 
 ## Docker volumes
